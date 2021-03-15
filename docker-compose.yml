@@ -1,0 +1,19 @@
+version: '3.4'
+services:
+
+  db:
+    image: library/mysql:5.7
+    container_name: database
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_DATABASE: shopify
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 1234
+      MYSQL_ROOT_PASSWORD: 1234
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    ports:
+      - 3306:3306
+    volumes:
+      - /opt/scloud/call-center/mysql:/var/lib/mysql

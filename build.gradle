@@ -19,15 +19,25 @@ repositories {
 }
 
 dependencies {
+
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'com.vladmihalcea:hibernate-types-52:2.9.11'
+
+	implementation 'org.springframework.boot:spring-boot-starter-amqp'
+	implementation 'org.apache.httpcomponents:httpclient:4.5.2'
+
+	runtimeOnly 'mysql:mysql-connector-java'
+
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 }
 
-test {
-	useJUnitPlatform()
+bootJar {
+	enabled(true)
 }

@@ -33,7 +33,7 @@ public abstract class BaseRestRepository {
      * @throws RestRequestException
      * @return
      */
-    protected ResponseEntity<?> executeSync(HttpMethod method, String path, Object model, Class aClass, HttpHeaders headers) throws RestRequestException {
+    protected ResponseEntity executeSync(HttpMethod method, String path, Object model, Class aClass, HttpHeaders headers) throws RestRequestException {
 
         StopWatch sw = new StopWatch();
         sw.start();
