@@ -7,6 +7,8 @@ import org.hibernate.annotations.TypeDef;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -24,6 +26,14 @@ public class Product extends  BaseEntity {
     @Type(type = "uuid-char")
     @Column(name = "uuid", nullable = false, columnDefinition = "varchar(36) default ''")
     private UUID uuid;
+
+    @ToString.Exclude
+    @Builder.Default
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "store_product",
+            joinColumns = @JoinColumn(name = "product_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "store_id", referencedColumnName = "id"))
+    private List<Store> stores = Collections.emptyList();
 
     @Column(name = "since_id")
     public String sinceId;
@@ -48,6 +58,7 @@ public class Product extends  BaseEntity {
     @Column(name = "status")
     public String status;
 
-    @Column(name = "images")
-    public String images;
+    @Type( type = "json" )
+    @Column(name = "images", columnDefinition = "json")
+    public List<String> images;
 }

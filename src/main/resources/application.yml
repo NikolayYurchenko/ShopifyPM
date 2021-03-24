@@ -28,6 +28,8 @@ spring:
     password: 1234
 
 shopify:
+  init:
+    enabled: false
   rest:
     basePath: myshopify.com/admin/api/2021-01
   rabbitmq:
@@ -42,11 +44,4 @@ shopify:
     mapper:
       ACCEPT_CASE_INSENSITIVE_ENUMS: true
 
----
-spring:
-  jpa:
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
 

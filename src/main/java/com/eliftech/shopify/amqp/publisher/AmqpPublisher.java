@@ -19,12 +19,12 @@ public class AmqpPublisher {
 
     /**
      * Notify about product sync
-     * @param products
+     * @param storeName
      */
-    public void notifyProductSync(List<ProductRestResponse> products) {
+    public void notifyProductSync(String storeName) {
 
-        log.info("Publish event to sync products, size:[{}]", products.size());
+        log.info("Publish event to sync products by store:[{}]", storeName);
 
-        rabbitTemplate.convertAndSend(AmqpConnectionConfig.SYNC_PRODUCT_QUEUE, products);
+        rabbitTemplate.convertAndSend(AmqpConnectionConfig.SYNC_PRODUCT_QUEUE, storeName);
     }
 }
