@@ -31,6 +31,7 @@ public class StoreDataService {
         Store store = Store.builder()
                 .uuid(UUID.randomUUID())
                 .apiKey(request.getApiKey())
+                .password(request.getPassword())
                 .name(request.getName())
                 .products(Collections.emptyList())
                 .build();

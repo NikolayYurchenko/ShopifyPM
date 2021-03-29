@@ -28,6 +28,9 @@ public class Store extends BaseEntity {
     @Column(name = "name", nullable = false)
     public String name;
 
+    @Column(name = "password", nullable = false)
+    public String password;
+
     @Column(name = "api_key", nullable = false)
     public String apiKey;
 

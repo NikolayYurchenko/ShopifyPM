@@ -23,8 +23,8 @@ spring:
       data-source-properties:
         useUnicode: true
         characterEncoding: UTF-8
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/shopify
-    username: root
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:3309/shopify
+    username: abc
     password: 1234
 
 shopify:

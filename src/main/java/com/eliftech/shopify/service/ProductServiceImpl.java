@@ -31,7 +31,7 @@ public class ProductServiceImpl implements ProductService {
 
         Optional<Product> product = productDataService.findLastProductByStore(store.getUuid().toString());
 
-        List<ProductRestResponse> products = shopifyRestRepository.getActualProducts(storeName, store.getApiKey(), product.map(Product::getSinceId).orElse(null));
+        List<ProductRestResponse> products = shopifyRestRepository.getActualProducts(storeName, store.getPassword(), product.map(Product::getSinceId).orElse(null));
 
         productDataService.create(products, storeName);
     }
