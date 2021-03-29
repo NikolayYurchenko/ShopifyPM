@@ -1,0 +1,47 @@
+logging:
+  level.root.: info
+  level.com.eliftech: debug
+
+server:
+  port: 50000
+  compression:
+    enabled: true
+
+spring:
+  application:
+    name: shopify-pm
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect
+        enable_lazy_load_no_trans: true
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      data-source-properties:
+        useUnicode: true
+        characterEncoding: UTF-8
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/shopify
+    username: root
+    password: 1234
+
+shopify:
+  init:
+    enabled: false
+  rest:
+    basePath: myshopify.com/admin/api/2021-01
+  rabbitmq:
+    host: localhost
+    port: 5672
+
+  #  redis:
+  #    url: ${REDIS_URI:redis://localhost:6379}
+  jackson:
+    default-property-inclusion: NON_EMPTY
+    property-naming-strategy: SNAKE_CASE
+    mapper:
+      ACCEPT_CASE_INSENSITIVE_ENUMS: true
+
+

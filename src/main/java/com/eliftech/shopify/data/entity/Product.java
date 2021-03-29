@@ -27,6 +27,9 @@ public class Product extends  BaseEntity {
     @Column(name = "uuid", nullable = false, columnDefinition = "varchar(36) default ''")
     private UUID uuid;
 
+    @Column(name = "since_id")
+    private String sinceId;
+
     @ToString.Exclude
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
@@ -35,30 +38,9 @@ public class Product extends  BaseEntity {
             inverseJoinColumns = @JoinColumn(name = "store_id", referencedColumnName = "id"))
     private List<Store> stores = Collections.emptyList();
 
-    @Column(name = "since_id")
-    public String sinceId;
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "product")
+    private List<ProductData> states = Collections.emptyList();
 
     @Column(name = "handle", nullable = false)
-    public String handle;
-
-    @Type( type = "json" )
-    @Column(name = "title", columnDefinition = "json")
-    public Map<String, String> title;
-
-    @Type( type = "json" )
-    @Column(name = "description", columnDefinition = "json")
-    public Map<String, String> description;
-
-    @Column(name = "price")
-    public String price;
-
-    @Column(name = "tags")
-    public String tags;
-
-    @Column(name = "status")
-    public String status;
-
-    @Type( type = "json" )
-    @Column(name = "images", columnDefinition = "json")
-    public List<String> images;
+    private String handle;
 }

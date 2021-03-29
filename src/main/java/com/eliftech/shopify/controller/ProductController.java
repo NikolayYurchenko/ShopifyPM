@@ -2,6 +2,7 @@ package com.eliftech.shopify.controller;
 
 import com.eliftech.shopify.amqp.publisher.AmqpPublisher;
 import com.eliftech.shopify.data.entity.Product;
+import com.eliftech.shopify.model.ProductResponse;
 import com.eliftech.shopify.rest.model.ProductRestResponse;
 import com.eliftech.shopify.service.contract.ProductService;
 import io.swagger.annotations.Api;
@@ -11,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 
@@ -35,10 +38,12 @@ public class ProductController {
 
     @GetMapping
     @ApiOperation("Find products")
-    public List<Product> findAll(@RequestParam @NotBlank String storeName) {
+    public List<ProductResponse> findAll(@RequestParam @NotBlank String storeName,
+                                         @RequestParam@Min(0L)@Max(100L) int page,
+                                         @RequestParam @Min(1L) @Max(100L) int limit) {
 
-        log.info("Request for get products by store name:[{}]", storeName);
+        log.info("Request for get products by store name:[{}], ({}, {})", storeName, page, limit);
 
-        return productService.findAll(storeName);
+        return productService.findAll(storeName, page, limit);
     }
 }
