@@ -35,4 +35,12 @@ public class ProductServiceImpl implements ProductService {
 
         productDataService.create(products, storeName);
     }
+
+    @Override
+    public List<Product> findAll(String storeName) {
+
+        Store store = storeDataService.findByName(storeName);
+
+        return productDataService.findAll(store.getUuid().toString());
+    }
 }

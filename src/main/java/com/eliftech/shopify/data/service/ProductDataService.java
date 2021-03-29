@@ -72,4 +72,20 @@ public class ProductDataService {
 
         return product;
     }
+
+    /**
+     * Find all by store
+     * @param storeUid
+     * @return
+     */
+    public List<Product> findAll(String storeUid) {
+
+        log.info("Searching  products by store:[{}]", storeUid);
+
+        List<Product> products = productRepository.findAll(storeUid);
+
+        log.info("...found:[{}]", products.size());
+
+        return products;
+    }
 }
