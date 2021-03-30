@@ -1,6 +1,8 @@
 package com.eliftech.shopify.controller;
 
 import com.eliftech.shopify.amqp.publisher.AmqpPublisher;
+import com.eliftech.shopify.amqp.publisher.ProductSyncRequest;
+import com.eliftech.shopify.amqp.publisher.ProductSyncType;
 import com.eliftech.shopify.data.entity.Product;
 import com.eliftech.shopify.model.ProductResponse;
 import com.eliftech.shopify.rest.model.ProductRestResponse;
@@ -16,6 +18,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -33,7 +36,17 @@ public class ProductController {
 
         log.info("Request for sync products by store name:[{}]", storeName);
 
-        amqpPublisher.notifyProductSync(storeName);
+        amqpPublisher.notifyProductSync(ProductSyncType.BATCH, ProductSyncRequest.instance(storeName, null));
+    }
+
+    @PostMapping("/sync/{productUid}")
+    @ApiOperation("Sync product by uuid")
+    public void sync(@PathVariable @NotBlank String productUid,
+                     @RequestParam @NotBlank String storeName) {
+
+        log.info("Request for sync product by uuid:[{}] for store by name:[{}]", productUid,  storeName);
+
+        amqpPublisher.notifyProductSync(ProductSyncType.SINGLE, ProductSyncRequest.instance(storeName, productUid));
     }
 
     @GetMapping
@@ -45,5 +58,14 @@ public class ProductController {
         log.info("Request for get products by store name:[{}], ({}, {})", storeName, page, limit);
 
         return productService.findAll(storeName, page, limit);
+    }
+
+    @GetMapping("/{productUid}")
+    @ApiOperation("Find product by uuid")
+    public Map<String, ProductResponse> findByUuid(@PathVariable @NotBlank String productUid) {
+
+        log.info("Request for find product by uuid:[{}]", productUid);
+
+        return productService.findByUuid(productUid);
     }
 }

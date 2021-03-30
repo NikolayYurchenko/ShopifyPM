@@ -19,12 +19,20 @@ public class AmqpPublisher {
 
     /**
      * Notify about product sync
-     * @param storeName
+     * @param type
+     * @param request
      */
-    public void notifyProductSync(String storeName) {
+    public void notifyProductSync(ProductSyncType type, ProductSyncRequest request) {
 
-        log.info("Publish event to sync products by store:[{}]", storeName);
+        log.info("Publish event to sync products by store:[{}]", request.getStoreName());
 
-        rabbitTemplate.convertAndSend(AmqpConnectionConfig.SYNC_PRODUCT_QUEUE, storeName);
+        if (type.equals(ProductSyncType.BATCH)) {
+
+            rabbitTemplate.convertAndSend(AmqpConnectionConfig.SYNC_PRODUCTS_QUEUE, request.getStoreName());
+
+        } else {
+
+            rabbitTemplate.convertAndSend(AmqpConnectionConfig.SYNC_SINGLE_PRODUCT_QUEUE, request);
+        }
     }
 }

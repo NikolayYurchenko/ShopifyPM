@@ -2,16 +2,11 @@ package com.eliftech.shopify.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Data
 @AllArgsConstructor
@@ -44,11 +39,11 @@ public class ProductRestResponse implements Serializable {
 
     private String adminGraphqlApiId;
 
-    private List<Variant> variants = null;
+    private List<Variant> variants = Collections.emptyList();
 
-    private List<Option> options = null;
+    private List<Option> options = Collections.emptyList();
 
-    private List<Image> images = null;
+    private List<Image> images = Collections.emptyList();
 
     private Image image;
 

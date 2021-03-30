@@ -140,4 +140,22 @@ public class ProductDataService {
 
         productRepository.save(product);
     }
+
+    /**
+     * Refresh product state
+     * @param productUid
+     * @param storeUid
+     * @param request
+     */
+    public void refreshState(String productUid, String storeUid, ProductRestResponse request) {
+
+        Product product = this.findByUuid(productUid);
+
+        Optional<ProductData> productData = product.getStates().stream().filter(state -> state.getStoreUid().equals(storeUid)).findFirst();
+
+        productData.ifPresent(productState -> {
+
+            stateDataService.update(productState.getUuid().toString(), request);
+        });
+    }
 }

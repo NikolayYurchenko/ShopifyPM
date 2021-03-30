@@ -6,6 +6,7 @@ import com.eliftech.shopify.model.ProductResponse;
 import com.eliftech.shopify.rest.model.ProductRestResponse;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ProductService {
 
@@ -16,6 +17,13 @@ public interface ProductService {
     void sync(String storeName);
 
     /**
+     * Sync certain product
+     * @param storeName
+     * @param productId
+     */
+    void syncCertain(String storeName, String productUid);
+
+    /**
      * Find all products
      * @param storeName
      * @param page
@@ -23,4 +31,11 @@ public interface ProductService {
      * @return
      */
     List<ProductResponse> findAll(String storeName, int page, int limit);
+
+    /**
+     * Find product by uuid
+     * @param productUid
+     * @return
+     */
+    Map<String, ProductResponse> findByUuid(String productUid);
 }

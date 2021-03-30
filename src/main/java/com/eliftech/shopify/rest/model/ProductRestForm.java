@@ -43,10 +43,9 @@ public class ProductRestForm {
 //
 //    public List<Option> options = null;
 //
-//    public List<Image> images = null;
+    public List<Image> images = null;
 //
-//    public Image image;
-
+    public Image image;
 
     private String status;
 

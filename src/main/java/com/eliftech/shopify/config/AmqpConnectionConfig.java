@@ -22,7 +22,8 @@ public class AmqpConnectionConfig {
     @Value(value = "${shopify.rabbitmq.host}")
     private String host;
 
-    public static final String SYNC_PRODUCT_QUEUE = "shopify.products.sync";
+    public static final String SYNC_PRODUCTS_QUEUE = "shopify.products.sync";
+    public static final String SYNC_SINGLE_PRODUCT_QUEUE = "shopify.product.single.sync";
 
     @Bean
     ConnectionFactory connectionFactory() {
@@ -58,7 +59,12 @@ public class AmqpConnectionConfig {
 
     @Bean
     Queue productsSyncDirect() {
-        return new Queue(SYNC_PRODUCT_QUEUE);
+        return new Queue(SYNC_PRODUCTS_QUEUE);
+    }
+
+    @Bean
+    Queue productSingleSyncDirect() {
+        return new Queue(SYNC_SINGLE_PRODUCT_QUEUE);
     }
 
     @Bean

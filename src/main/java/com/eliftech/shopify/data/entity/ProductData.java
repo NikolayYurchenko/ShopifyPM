@@ -9,6 +9,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -20,6 +21,10 @@ import java.util.Map;
 @EntityListeners(AuditingEntityListener.class)
 @TypeDef(name = "json", typeClass = JsonStringType.class)
 public class ProductData extends BaseEntity {
+
+    @Type(type = "uuid-char")
+    @Column(name = "uuid", nullable = false, columnDefinition = "varchar(36) default ''")
+    private UUID uuid;
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
@@ -43,6 +48,15 @@ public class ProductData extends BaseEntity {
 
     @Column(name = "status")
     private String status;
+
+    @Column(name = "vendor")
+    private String vendor;
+
+    @Column(name = "inventory")
+    private String inventory;
+
+    @Column(name = "product_type")
+    private String productType;
 
     @Type( type = "json" )
     @Column(name = "images", columnDefinition = "json")

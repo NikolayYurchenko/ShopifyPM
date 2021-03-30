@@ -1,9 +1,7 @@
 package com.eliftech.shopify.rest;
 
 import com.eliftech.shopify.rest.exception.RestRequestException;
-import com.eliftech.shopify.rest.model.Option;
-import com.eliftech.shopify.rest.model.ProductListResponse;
-import com.eliftech.shopify.rest.model.ProductRestResponse;
+import com.eliftech.shopify.rest.model.*;
 import com.sun.istack.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -18,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriBuilder;
 
+import javax.annotation.PostConstruct;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +37,9 @@ public class ShopifyRestRepository extends BaseRestRepository {
 
     private final String PRODUCTS_POSTFIX = "products.json";
     private final String ORDERS_POSTFIX = "orders.json";
+    private final String INVENTORY_POSTFIX = "inventory_items.json";
+
+    private final String API_EXTENSION = ".json";
 
     private final Map<String, List<ProductRestResponse>> allProducts = new HashMap<>();
 
@@ -81,6 +83,37 @@ public class ShopifyRestRepository extends BaseRestRepository {
 
     @SneakyThrows
     @SuppressWarnings("all")
+    public ProductRestResponse getProductById(String storeName, String productId, String password) {
+
+        try {
+
+            log.info("Try to get product with id:[{}] from store:[{}]", productId, storeName);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set(AUTH_HEADER, password);
+
+            URI fullPath = new URIBuilder()
+                    .setScheme("https")
+                    .setHost(storeName + "." + host + "/")
+                    .setPath(PRODUCTS_POSTFIX.replace(API_EXTENSION, "") + "/" + productId + API_EXTENSION)
+                    .build();
+
+            ResponseEntity<ProductResponseWrapper> response = super.executeSync(HttpMethod.GET, fullPath.toString(), null,  ProductResponseWrapper.class, headers);
+
+            log.info("...receive response:[{}]", response.getBody());
+
+            return response.getBody().getProduct();
+
+        } catch (Exception e) {
+
+            log.error("Something when wrong when try get product with id:[{}] from store:[{}], cause:[{}]", productId, storeName, e.getMessage());
+
+            throw new RestRequestException(e.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @SuppressWarnings("all")
     private void getAnotherBatchIfNeed(String linkForBatch, String password) {
 
         if (linkForBatch != null) {
@@ -112,6 +145,38 @@ public class ShopifyRestRepository extends BaseRestRepository {
 
                 throw new RestRequestException(e.getMessage());
             }
+        }
+    }
+
+    @SneakyThrows
+    @SuppressWarnings("all")
+    protected InventoryListResponse getInventories(String storeName, List<String> productIds, String password) {
+
+        try {
+
+            log.info("Getting inventory by products:{}", productIds);
+
+            URI fullPath = new URIBuilder()
+                    .setScheme("https")
+                    .setHost(storeName + "." + host + "/")
+                    .setPath(INVENTORY_POSTFIX)
+                    .setParameter("ids", productIds.toString())
+                    .build();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set(AUTH_HEADER, password);
+
+            ResponseEntity<InventoryListResponse> response = super.executeSync(HttpMethod.GET, fullPath.toString(), null,  InventoryListResponse.class, headers);
+
+            log.info("...receive response:[{}]", response.getBody().getInventoryItems().size());
+
+            return response.getBody();
+
+        } catch (Exception e) {
+
+            log.error("Something when wrong when try get inventories:[{}], cause:[{}]", e.getMessage());
+
+            throw new RestRequestException(e.getMessage());
         }
     }
 }

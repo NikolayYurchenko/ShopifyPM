@@ -1,6 +1,7 @@
 package com.eliftech.shopify.amqp.listener;
 
 
+import com.eliftech.shopify.amqp.publisher.ProductSyncRequest;
 import com.eliftech.shopify.config.AmqpConnectionConfig;
 import com.eliftech.shopify.service.contract.ProductService;
 import lombok.AllArgsConstructor;
@@ -16,8 +17,8 @@ public class ProductsEventListener {
 
     private final ProductService productService;
 
-    @RabbitListener(queues = AmqpConnectionConfig.SYNC_PRODUCT_QUEUE)
-    public void handleProductSync(String storeName) {
+    @RabbitListener(queues = AmqpConnectionConfig.SYNC_PRODUCTS_QUEUE)
+    public void handleProductsSync(String storeName) {
 
         try {
 
@@ -28,6 +29,21 @@ public class ProductsEventListener {
         } catch (Exception e) {
             
             log.error("Failed sync products from store:[{}], cause:[{}]", storeName, e.getMessage());
+        }
+    }
+
+    @RabbitListener(queues = AmqpConnectionConfig.SYNC_SINGLE_PRODUCT_QUEUE)
+    public void handleSingleProductSync(ProductSyncRequest request) {
+
+        try {
+
+            log.info("Receive event about sync product by store name:[{}]", request.getStoreName());
+
+            productService.syncCertain(request.getStoreName(), request.getProductUid());
+
+        } catch (Exception e) {
+
+            log.error("Failed sync product from store:[{}], cause:[{}]", request.getStoreName(), e.getMessage());
         }
     }
 }

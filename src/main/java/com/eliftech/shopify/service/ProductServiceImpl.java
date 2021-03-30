@@ -15,10 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -62,6 +59,18 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public void syncCertain(String storeName, String productUid) {
+
+        Store store = storeDataService.findByName(storeName);
+
+        Product product = productDataService.findByUuid(productUid);
+
+        ProductRestResponse productRest = shopifyRestRepository.getProductById(storeName, product.getSinceId(), store.getPassword());
+
+        productDataService.refreshState(productUid, store.getUuid().toString(), productRest);
+    }
+
+    @Override
     public List<ProductResponse> findAll(String storeName, int page, int limit) {
 
         Store store = storeDataService.findByName(storeName);
@@ -74,5 +83,14 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
 
         return ProductResponse.instance(store.getUuid().toString(), states);
+    }
+
+    @Override
+    public Map<String, ProductResponse> findByUuid(String productUid) {
+
+        Product product = productDataService.findByUuid(productUid);
+
+        return product.getStates().stream()
+                .collect(Collectors.toMap(ProductData::getStoreUid, s -> ProductResponse.instance(s.getStoreUid(), s)));
     }
 }

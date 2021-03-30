@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -35,8 +36,12 @@ public class ProductStateDataService {
         log.info("Creating state for product:[{}]", product.getUuid());
 
         ProductData state = ProductData.builder()
+                .uuid(UUID.randomUUID())
                 .storeUid(storeUid)
                 .product(product)
+                .vendor(request.getVendor())
+//                .inventory(request.get)
+                .productType(request.getProductType())
                 .description(request.getBodyHtml())
                 .title(request.getTitle())
                 .tags(request.getTags())
@@ -45,5 +50,34 @@ public class ProductStateDataService {
                 .build();
 
         return productDataRepository.save(state);
+    }
+
+    /**
+     * Update product state
+     * @param productDataUid
+     * @param request
+     */
+    public void update(String productDataUid, ProductRestResponse request) {
+
+        log.info("Updating product state:[{}] to:[{}]", productDataUid, request);
+
+        ProductData state = productDataRepository.findByUuid(UUID.fromString(productDataUid))
+                .orElseThrow(() -> new EntityNotFoundException("Not found product state by uuid:["+ productDataUid +"]"));
+
+        state.setVendor(request.getVendor());
+
+        state.setProductType(request.getProductType());
+
+        state.setDescription(request.getBodyHtml());
+
+        state.setTitle(request.getTitle());
+
+        state.setTags(request.getTags());
+
+        state.setImages(request.getImages().stream().map(Image::getSrc).collect(Collectors.toList()));
+
+        state.setStatus(request.getStatus());
+
+        productDataRepository.save(state);
     }
 }
