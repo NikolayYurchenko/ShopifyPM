@@ -31,6 +31,7 @@ public class Product extends  BaseEntity {
     private String sinceId;
 
     @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "store_product",
@@ -38,6 +39,9 @@ public class Product extends  BaseEntity {
             inverseJoinColumns = @JoinColumn(name = "store_id", referencedColumnName = "id"))
     private List<Store> stores = Collections.emptyList();
 
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "product")
     private List<ProductData> states = Collections.emptyList();
 

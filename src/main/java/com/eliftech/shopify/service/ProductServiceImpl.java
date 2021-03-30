@@ -36,9 +36,7 @@ public class ProductServiceImpl implements ProductService {
 
         Store store = storeDataService.findByName(storeName);
 
-        Optional<Product> lastProduct = productDataService.findLastProductByStore(store.getUuid().toString());
-
-        List<ProductRestResponse> products = shopifyRestRepository.getActualProducts(storeName, store.getPassword(), lastProduct.map(Product::getSinceId).orElse(null));
+        List<ProductRestResponse> products = shopifyRestRepository.getActualProducts(storeName, store.getPassword());
 
         List<String> existStates = new ArrayList<>();
 
@@ -48,16 +46,13 @@ public class ProductServiceImpl implements ProductService {
 
             existProductByHandle.ifPresent(existProduct -> {
 
-                List<String> relatedStores = existProduct.getStores().stream().map(Store::getName).collect(Collectors.toList());
+                List<String> relatedStores = existProduct.getStores().stream().map(s -> s.getUuid().toString()).collect(Collectors.toList());
 
                 if (!relatedStores.contains(store.getUuid().toString())) {
-
                     productDataService.addState(store.getUuid().toString(), existProduct.getUuid().toString(), product);
-
-                } else {
-
-                    existStates.add(product.getId());
                 }
+
+                existStates.add(product.getId());
             });
         });
 

@@ -89,4 +89,20 @@ public class ProductRestResponse implements Serializable {
         }
         return this.sizeIndex;
     }
+
+    public static String formatNextBatchLink(String link) {
+        return link != null? link.substring(link.indexOf('<') + 1, link.indexOf('>')) : "";
+    }
+
+    public static String parseNextBatchLinkAndFormat(String link) {
+
+        if (link.indexOf("next") > 0) {
+
+            int indexStart = link.indexOf(",");
+
+            return link.substring(indexStart + 2, link.lastIndexOf(">") + 1);
+        }
+
+        return null;
+    }
 }

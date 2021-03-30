@@ -36,24 +36,27 @@ public class ProductDataService {
 
         log.info("Creating products:[{}]", productsForm.size());
 
-        Store store = storeDataService.findByName(storeName);
+        if (!productsForm.isEmpty()) {
 
-        String storeUid = store.getUuid().toString();
+            Store store = storeDataService.findByName(storeName);
 
-        List<Product> products = productsForm.stream()
-                .map(product -> Product.builder()
-                 .uuid(UUID.randomUUID())
-                 .handle(product.getHandle())
-                 .sinceId(product.getId())
-                 .stores(List.of(store))
-                 .build()).collect(Collectors.toList());
+            String storeUid = store.getUuid().toString();
 
-        store.getProducts().addAll(products);
+            List<Product> products = productsForm.stream()
+                    .map(product -> Product.builder()
+                            .uuid(UUID.randomUUID())
+                            .handle(product.getHandle())
+                            .sinceId(product.getId())
+                            .stores(List.of(store))
+                            .build()).collect(Collectors.toList());
 
-        List<Product> savedProducts = productRepository.saveAll(products);
+            store.getProducts().addAll(products);
 
-        savedProducts.forEach(p ->
-                stateDataService.create(storeUid, p, Objects.requireNonNull(productsForm.stream().filter(f -> f.getId().equals(p.getSinceId())).findFirst().orElse(null))));
+            List<Product> savedProducts = productRepository.saveAll(products);
+
+            savedProducts.forEach(p ->
+                    stateDataService.create(storeUid, p, Objects.requireNonNull(productsForm.stream().filter(f -> f.getId().equals(p.getSinceId())).findFirst().orElse(null))));
+        }
     }
 
     /**

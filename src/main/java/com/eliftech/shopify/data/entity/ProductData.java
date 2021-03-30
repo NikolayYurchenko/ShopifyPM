@@ -21,18 +21,18 @@ import java.util.Map;
 @TypeDef(name = "json", typeClass = JsonStringType.class)
 public class ProductData extends BaseEntity {
 
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
     private Product product;
 
     @Column(name = "store_uuid")
     private String storeUid;
 
-    @Type( type = "json" )
     @Column(name = "title")
     private String title;
 
-    @Type( type = "json" )
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "varchar(5000)")
     private String description;
 
     @Column(name = "price")
