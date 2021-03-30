@@ -2,13 +2,12 @@ package com.eliftech.shopify.data.entity;
 
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.*;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -20,6 +19,15 @@ import javax.persistence.Table;
 @EntityListeners(AuditingEntityListener.class)
 @TypeDef(name = "json", typeClass = JsonStringType.class)
 public class SubProduct extends BaseEntity {
+
+    @Type(type = "uuid-char")
+    @Column(name = "uuid", nullable = false, columnDefinition = "varchar(36) default ''")
+    private UUID uuid;
+
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Product product;
 
     @Column(name = "title")
     private String title;

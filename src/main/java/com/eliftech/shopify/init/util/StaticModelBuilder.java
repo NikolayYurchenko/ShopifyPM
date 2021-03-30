@@ -1,7 +1,9 @@
 package com.eliftech.shopify.init.util;
 
 import com.eliftech.shopify.model.StoreForm;
+import com.eliftech.shopify.model.UserForm;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class StaticModelBuilder {
@@ -20,5 +22,19 @@ public class StaticModelBuilder {
                         .password("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")
                         .build()
         );
+    }
+
+    public static UserForm getUser() {
+
+        return UserForm.builder()
+                .email("email@gmail.com")
+                .emailStatus("confirm")
+                .loginSessionKey("login-session-key")
+                .name("manager")
+                .password("manager")
+                .passwordExpireData(LocalDateTime.now())
+                .passwordResetKey("reset-key")
+                .role("admin")
+                .build();
     }
 }

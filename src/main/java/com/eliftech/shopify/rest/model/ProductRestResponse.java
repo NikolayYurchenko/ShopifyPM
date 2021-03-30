@@ -100,4 +100,12 @@ public class ProductRestResponse implements Serializable {
 
         return null;
     }
+
+    public static ProductRestResponse filterBySinceId(List<ProductRestResponse> products, String sinceId) {
+
+        return Objects.requireNonNull(products.stream()
+                        .filter(product -> product.getId().equals(sinceId))
+                        .findFirst()
+                        .orElseThrow(() -> new IllegalStateException("Not found related product to product from shopify, since id:["+ sinceId +"]")));
+    }
 }

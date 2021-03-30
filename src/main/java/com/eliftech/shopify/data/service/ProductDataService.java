@@ -27,6 +27,7 @@ public class ProductDataService {
     private final ProductRepository productRepository;
     private final StoreDataService storeDataService;
     private final ProductStateDataService stateDataService;
+    private final SubProductDataService subProductDataService;
 
     /**
      * Create unique products
@@ -54,8 +55,11 @@ public class ProductDataService {
 
             List<Product> savedProducts = productRepository.saveAll(products);
 
-            savedProducts.forEach(p ->
-                    stateDataService.create(storeUid, p, Objects.requireNonNull(productsForm.stream().filter(f -> f.getId().equals(p.getSinceId())).findFirst().orElse(null))));
+            savedProducts.forEach(product -> subProductDataService.create(product,
+                    ProductRestResponse.filterBySinceId(productsForm, product.getSinceId()).getVariants()));
+
+            savedProducts.forEach(product ->
+                    stateDataService.create(storeUid, product, ProductRestResponse.filterBySinceId(productsForm, product.getSinceId()) ));
         }
     }
 

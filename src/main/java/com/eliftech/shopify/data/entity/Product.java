@@ -45,6 +45,12 @@ public class Product extends  BaseEntity {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "product")
     private List<ProductData> states = Collections.emptyList();
 
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @Builder.Default
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "product")
+    private List<SubProduct> subProducts = Collections.emptyList();
+
     @Column(name = "handle", nullable = false)
     private String handle;
 }
