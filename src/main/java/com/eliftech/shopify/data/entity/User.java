@@ -1,12 +1,11 @@
 package com.eliftech.shopify.data.entity;
 
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Data
@@ -17,15 +16,20 @@ import java.time.LocalDateTime;
 @Table(name = "users")
 @EqualsAndHashCode(callSuper = true)
 @EntityListeners(AuditingEntityListener.class)
-public class User extends BaseEntity {
+public class User {
 
-    @Column(name = "name")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "login_id", nullable = false, unique = true)
+    private Long id;
+
+    @Column(name = "user_name")
     private String name;
 
     @Column(name = "password")
     private String password;
 
-    @Column(name = "email")
+    @Column(name = "email_address")
     private String email;
 
     @Column(name = "role")
@@ -42,4 +46,12 @@ public class User extends BaseEntity {
 
     @Column(name = "password_reset_key")
     private String passwordResetKey;
+
+    @CreatedDate
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 }
