@@ -53,4 +53,12 @@ public class Product extends  BaseEntity {
 
     @Column(name = "handle", nullable = false)
     private String handle;
+
+    public ProductData getStateByStore(String storeUid) {
+
+        return this.states.stream()
+                .filter(state -> state.getStoreUid().equals(storeUid))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("State for store:["+ storeUid +"] is not present"));
+    }
 }

@@ -29,7 +29,7 @@ spring:
 
 shopify:
   init:
-    enabled: true
+    enabled: false
   rest:
     basePath: myshopify.com/admin/api/2021-01
   rabbitmq:

@@ -27,11 +27,13 @@ public class ProductResponse {
 
     private String handle;
 
-    private LocalDateTime createdAt;
+    private long createdAt;
 
-    private LocalDateTime updatedAt;
+    private long updatedAt;
 
     private String tags;
+
+    private List<SubProductResponse> subProducts;
 
     public static ProductResponse instance(String storeUid, ProductData product) {
 
@@ -41,9 +43,10 @@ public class ProductResponse {
                 .title(product.getTitle())
                 .bodyHtml(product.getDescription())
                 .handle(product.getProduct().getHandle())
-                .updatedAt(product.getProduct().getUpdatedAt())
-                .createdAt(product.getProduct().getCreatedAt())
+                .updatedAt(product.getProduct().getUpdatedAtInMilliseconds())
+                .createdAt(product.getProduct().getCreatedAtInMilliseconds())
                 .tags(product.getTags())
+                .subProducts(SubProductResponse.instance(product.getProduct().getSubProducts()))
                 .build();
     }
 

@@ -35,6 +35,7 @@ public class SubProductDataService {
 
             List<SubProduct> subProducts = variantForms.stream().map(variant -> SubProduct.builder()
                     .uuid(UUID.randomUUID())
+                    .externalId(variant.getId())
                     .product(product)
                     .title(variant.getTitle())
                     .price(variant.getPrice())

@@ -3,10 +3,12 @@ package com.eliftech.shopify.data.service;
 import com.eliftech.shopify.data.entity.Product;
 import com.eliftech.shopify.data.entity.ProductData;
 import com.eliftech.shopify.data.entity.Store;
+import com.eliftech.shopify.data.entity.SubProduct;
 import com.eliftech.shopify.data.repository.ProductRepository;
 import com.eliftech.shopify.rest.model.Image;
 import com.eliftech.shopify.rest.model.Option;
 import com.eliftech.shopify.rest.model.ProductRestResponse;
+import com.eliftech.shopify.rest.model.Variant;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,6 +131,36 @@ public class ProductDataService {
     }
 
     /**
+     * Update product
+     * @param productUid
+     * @param request
+     * @return
+     */
+    public Product update(String productUid, String storeUid, ProductRestResponse request) {
+
+        log.info("Updating product by uuid:[{}]", productUid);
+
+        Product product = this.findByUuid(productUid);
+
+        product.setHandle(request.getHandle());
+
+        product.setSinceId(request.getId());
+
+        Optional<ProductData> productData = product.getStates().stream().filter(state -> state.getStoreUid().equals(storeUid)).findFirst();
+
+        productData.ifPresent(state -> stateDataService.update(state.getUuid().toString(), request));
+
+        Map<String, Variant> variantEntries = product.getSubProducts().stream()
+                .collect(Collectors.toMap(subProduct -> subProduct.getUuid().toString(), subProduct -> Variant.getById(request.getVariants(), subProduct.getExternalId())));
+
+        subProductDataService.update(variantEntries);
+
+        productRepository.save(product);
+
+        return product;
+    }
+
+    /**
      * Add state for product
      * @param storeUid
      * @param productUid
@@ -141,6 +173,11 @@ public class ProductDataService {
         ProductData state = stateDataService.create(storeUid, product, request);
 
         product.getStates().add(state);
+
+        Map<String, Variant> variantEntries = product.getSubProducts().stream()
+                .collect(Collectors.toMap(subProduct -> subProduct.getUuid().toString(), subProduct -> Variant.getById(request.getVariants(), subProduct.getExternalId())));
+
+        subProductDataService.update(variantEntries);
 
         productRepository.save(product);
     }
@@ -161,5 +198,10 @@ public class ProductDataService {
 
             stateDataService.update(productState.getUuid().toString(), request);
         });
+
+        Map<String, Variant> variantEntries = product.getSubProducts().stream()
+                .collect(Collectors.toMap(subProduct -> subProduct.getUuid().toString(), subProduct -> Variant.getById(request.getVariants(), subProduct.getExternalId())));
+
+        subProductDataService.update(variantEntries);
     }
 }

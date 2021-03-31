@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -71,5 +73,13 @@ public class Variant {
         return StringUtils.joinWith("-", StringUtils
                 .trim(this.getOption1()),
                 StringUtils.trim(this.getOption2()),StringUtils.trim(this.getOption3()));
+    }
+
+    public static Variant getById(List<Variant> variants, String id) {
+
+        return variants.stream()
+                .filter(variant -> variant.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Varint with id:[{}] is not present"));
     }
 }

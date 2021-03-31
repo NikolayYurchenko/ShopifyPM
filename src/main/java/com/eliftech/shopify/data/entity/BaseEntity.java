@@ -6,12 +6,13 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Data
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public class BaseEntity {
+public abstract class BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,4 +26,12 @@ public class BaseEntity {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    public long getCreatedAtInMilliseconds() {
+        return Timestamp.valueOf(this.getCreatedAt()).getTime();
+    }
+
+    public long getUpdatedAtInMilliseconds() {
+        return Timestamp.valueOf(this.getUpdatedAt()).getTime();
+    }
 }

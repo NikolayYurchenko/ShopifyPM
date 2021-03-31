@@ -18,10 +18,7 @@ import org.springframework.web.util.UriBuilder;
 
 import javax.annotation.PostConstruct;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -37,11 +34,28 @@ public class ShopifyRestRepository extends BaseRestRepository {
 
     private final String PRODUCTS_POSTFIX = "products.json";
     private final String ORDERS_POSTFIX = "orders.json";
-    private final String INVENTORY_POSTFIX = "inventory_items.json";
 
     private final String API_EXTENSION = ".json";
 
     private final Map<String, List<ProductRestResponse>> allProducts = new HashMap<>();
+
+//    @PostConstruct
+//    public void init() {
+//
+//        UpdateProductRequest request = new UpdateProductRequest();
+//        request.setBodyHtml("<p> My description</p>");
+//        request.setHandle("my handle");
+//        request.setProductType("my product type");
+//        request.setStatus(ProductStatus.ACTIVE.getStatusName());
+//        request.setTags("my tags");
+//        request.setVariants(Collections.emptyList());
+//        request.setVendor("my vendor");
+//        request.setTitle("My product");
+//        request.setVariants(List.of(new VariantUpdateRequest("37038798536863", "50", "Updating the Product SKU")));
+//
+//        this.updateProduct("test-eliftech-store", "5893179408543", new UpdateProductWrapper(request),
+//                "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");
+//    }
 
     @SneakyThrows
     @SuppressWarnings("all")
@@ -150,27 +164,27 @@ public class ShopifyRestRepository extends BaseRestRepository {
 
     @SneakyThrows
     @SuppressWarnings("all")
-    protected InventoryListResponse getInventories(String storeName, List<String> productIds, String password) {
+    public ProductRestResponse updateProduct(String storeName, String productId, UpdateProductRequest request, String password) {
 
         try {
 
-            log.info("Getting inventory by products:{}", productIds);
+            log.info("Updating product by id:[{}]", productId);
 
             URI fullPath = new URIBuilder()
                     .setScheme("https")
                     .setHost(storeName + "." + host + "/")
-                    .setPath(INVENTORY_POSTFIX)
-                    .setParameter("ids", productIds.toString())
+                    .setPath(PRODUCTS_POSTFIX.replace(API_EXTENSION, "") + "/" + productId + API_EXTENSION)
                     .build();
 
             HttpHeaders headers = new HttpHeaders();
             headers.set(AUTH_HEADER, password);
 
-            ResponseEntity<InventoryListResponse> response = super.executeSync(HttpMethod.GET, fullPath.toString(), null,  InventoryListResponse.class, headers);
+            ResponseEntity<ProductResponseWrapper> response = super.executeSync(HttpMethod.PUT, fullPath.toString(),
+                    new UpdateProductWrapper(request),  ProductResponseWrapper.class, headers);
 
-            log.info("...receive response:[{}]", response.getBody().getInventoryItems().size());
+            log.info("...receive response:[{}]", response.getBody().getProduct());
 
-            return response.getBody();
+            return response.getBody().getProduct();
 
         } catch (Exception e) {
 

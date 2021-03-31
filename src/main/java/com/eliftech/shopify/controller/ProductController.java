@@ -6,6 +6,7 @@ import com.eliftech.shopify.amqp.publisher.ProductSyncType;
 import com.eliftech.shopify.data.entity.Product;
 import com.eliftech.shopify.model.ProductResponse;
 import com.eliftech.shopify.rest.model.ProductRestResponse;
+import com.eliftech.shopify.rest.model.UpdateProductRequest;
 import com.eliftech.shopify.service.contract.ProductService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -47,6 +49,17 @@ public class ProductController {
         log.info("Request for sync product by uuid:[{}] for store by name:[{}]", productUid,  storeName);
 
         amqpPublisher.notifyProductSync(ProductSyncType.SINGLE, ProductSyncRequest.instance(storeName, productUid));
+    }
+
+    @PutMapping("/{productUid}")
+    @ApiOperation("Update product by uuid")
+    public ProductResponse update(@PathVariable @NotBlank String productUid,
+                       @RequestParam @NotBlank String storeName,
+                       @RequestBody @Valid UpdateProductRequest request) {
+
+        log.info("Request for update product by uuid:[{}] for store by name:[{}]", productUid,  storeName);
+
+        return productService.update(storeName, productUid, request);
     }
 
     @GetMapping

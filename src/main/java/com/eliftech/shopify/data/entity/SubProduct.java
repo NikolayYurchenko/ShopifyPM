@@ -29,6 +29,9 @@ public class SubProduct extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Product product;
 
+    @Column(name = "external_id")
+    private String externalId;
+
     @Column(name = "title")
     private String title;
 

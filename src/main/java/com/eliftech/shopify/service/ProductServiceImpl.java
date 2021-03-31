@@ -3,11 +3,14 @@ package com.eliftech.shopify.service;
 import com.eliftech.shopify.data.entity.Product;
 import com.eliftech.shopify.data.entity.ProductData;
 import com.eliftech.shopify.data.entity.Store;
+import com.eliftech.shopify.data.entity.SubProduct;
 import com.eliftech.shopify.data.service.ProductDataService;
 import com.eliftech.shopify.data.service.StoreDataService;
 import com.eliftech.shopify.model.ProductResponse;
 import com.eliftech.shopify.rest.ShopifyRestRepository;
 import com.eliftech.shopify.rest.model.ProductRestResponse;
+import com.eliftech.shopify.rest.model.UpdateProductRequest;
+import com.eliftech.shopify.rest.model.AbstractItem;
 import com.eliftech.shopify.service.contract.ProductService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,6 +71,30 @@ public class ProductServiceImpl implements ProductService {
         ProductRestResponse productRest = shopifyRestRepository.getProductById(storeName, product.getSinceId(), store.getPassword());
 
         productDataService.refreshState(productUid, store.getUuid().toString(), productRest);
+    }
+
+    @Override
+    public ProductResponse update(String storeName, String productUid, UpdateProductRequest request) {
+
+        Store store = storeDataService.findByName(storeName);
+
+        Product product = productDataService.findByUuid(productUid);
+
+        if (request.getVariants().isEmpty()) {
+
+            List<AbstractItem> variants = product.getSubProducts().stream()
+                    .map(SubProduct::getExternalId)
+                    .map(AbstractItem::new)
+                    .collect(Collectors.toList());
+
+            request.setVariants(variants);
+        }
+
+        ProductRestResponse restProduct = shopifyRestRepository.updateProduct(storeName, product.getSinceId(), request, store.getPassword());
+
+        Product updatedProduct = productDataService.update(productUid, storeName, restProduct);
+
+        return ProductResponse.instance(store.getUuid().toString(), updatedProduct.getStateByStore(store.getUuid().toString()));
     }
 
     @Override
