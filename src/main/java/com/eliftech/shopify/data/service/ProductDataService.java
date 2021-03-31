@@ -168,9 +168,7 @@ public class ProductDataService {
 
         product.getStates().add(state);
 
-        Product savedProduct = productRepository.save(product);
-
-        subProductDataService.update(storeUid, savedProduct, request);
+        productRepository.save(product);
     }
 
 
