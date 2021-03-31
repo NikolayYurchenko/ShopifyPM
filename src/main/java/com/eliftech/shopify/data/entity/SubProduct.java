@@ -27,7 +27,7 @@ public class SubProduct extends BaseEntity {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @ManyToOne(fetch = FetchType.LAZY)
-    private Product product;
+    private ProductData product;
 
     @Column(name = "external_id")
     private String externalId;

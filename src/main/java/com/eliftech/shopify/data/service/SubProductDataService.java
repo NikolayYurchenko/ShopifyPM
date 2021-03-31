@@ -2,8 +2,10 @@ package com.eliftech.shopify.data.service;
 
 
 import com.eliftech.shopify.data.entity.Product;
+import com.eliftech.shopify.data.entity.ProductData;
 import com.eliftech.shopify.data.entity.SubProduct;
 import com.eliftech.shopify.data.repository.SubProductRepository;
+import com.eliftech.shopify.rest.model.ProductRestResponse;
 import com.eliftech.shopify.rest.model.Variant;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +29,7 @@ public class SubProductDataService {
      * @param variantForms
      * @return
      */
-    protected void create(Product product, List<Variant> variantForms) {
+    protected void create(ProductData product, List<Variant> variantForms) {
 
         log.info("Creating sub products for product:[{}], size:[{}]", product.getUuid(), variantForms.size());
 
@@ -77,16 +79,23 @@ public class SubProductDataService {
     }
 
     /**
-     * Update sub products
-     * @param variantFormEntries
+     *  Update sub products
+     * @param product
+     * @param productForm
      */
-    protected void update(Map<String, Variant> variantFormEntries) {
+    protected void update(String storeUid, Product product, ProductRestResponse productForm) {
 
-        log.info("Updating sub products by ids:{}", variantFormEntries.keySet());
+        Map<String, Variant> variantEntries = product.getStates().stream()
+                .filter(state -> state.getStoreUid().equals(storeUid))
+                .map(ProductData::getSubProducts)
+                .flatMap(List::stream)
+                .collect(Collectors.toMap(subProduct -> subProduct.getUuid().toString(), subProduct -> Variant.getById(productForm.getVariants(), subProduct.getExternalId())));
+
+        log.info("Updating sub products by ids:{}", variantEntries.keySet());
 
         List<SubProduct> updateSubProducts = new ArrayList<>();
 
-        variantFormEntries.forEach((subProductUid, variant) -> {
+        variantEntries.forEach((subProductUid, variant) -> {
 
             SubProduct subProduct = this.findByUuid(subProductUid);
 

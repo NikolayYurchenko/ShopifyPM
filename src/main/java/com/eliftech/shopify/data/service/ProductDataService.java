@@ -57,9 +57,6 @@ public class ProductDataService {
 
             List<Product> savedProducts = productRepository.saveAll(products);
 
-            savedProducts.forEach(product -> subProductDataService.create(product,
-                    ProductRestResponse.filterBySinceId(productsForm, product.getSinceId()).getVariants()));
-
             savedProducts.forEach(product ->
                     stateDataService.create(storeUid, product, ProductRestResponse.filterBySinceId(productsForm, product.getSinceId()) ));
         }
@@ -150,10 +147,7 @@ public class ProductDataService {
 
         productData.ifPresent(state -> stateDataService.update(state.getUuid().toString(), request));
 
-        Map<String, Variant> variantEntries = product.getSubProducts().stream()
-                .collect(Collectors.toMap(subProduct -> subProduct.getUuid().toString(), subProduct -> Variant.getById(request.getVariants(), subProduct.getExternalId())));
-
-        subProductDataService.update(variantEntries);
+        subProductDataService.update(storeUid, product, request);
 
         productRepository.save(product);
 
@@ -174,13 +168,11 @@ public class ProductDataService {
 
         product.getStates().add(state);
 
-        Map<String, Variant> variantEntries = product.getSubProducts().stream()
-                .collect(Collectors.toMap(subProduct -> subProduct.getUuid().toString(), subProduct -> Variant.getById(request.getVariants(), subProduct.getExternalId())));
+        Product savedProduct = productRepository.save(product);
 
-        subProductDataService.update(variantEntries);
-
-        productRepository.save(product);
+        subProductDataService.update(storeUid, savedProduct, request);
     }
+
 
     /**
      * Refresh product state
@@ -199,9 +191,6 @@ public class ProductDataService {
             stateDataService.update(productState.getUuid().toString(), request);
         });
 
-        Map<String, Variant> variantEntries = product.getSubProducts().stream()
-                .collect(Collectors.toMap(subProduct -> subProduct.getUuid().toString(), subProduct -> Variant.getById(request.getVariants(), subProduct.getExternalId())));
-
-        subProductDataService.update(variantEntries);
+        subProductDataService.update(storeUid, product, request);
     }
 }

@@ -46,7 +46,7 @@ public class ProductResponse {
                 .updatedAt(product.getProduct().getUpdatedAtInMilliseconds())
                 .createdAt(product.getProduct().getCreatedAtInMilliseconds())
                 .tags(product.getTags())
-                .subProducts(SubProductResponse.instance(product.getProduct().getSubProducts()))
+                .subProducts(SubProductResponse.instance(product.getSubProducts()))
                 .build();
     }
 

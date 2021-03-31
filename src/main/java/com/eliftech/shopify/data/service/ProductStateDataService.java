@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class ProductStateDataService {
 
+    private final SubProductDataService subProductDataService;
     private final ProductDataRepository productDataRepository;
 
     /**
@@ -49,7 +50,11 @@ public class ProductStateDataService {
                 .status(request.getStatus())
                 .build();
 
-        return productDataRepository.save(state);
+        ProductData savedState = productDataRepository.save(state);
+
+        subProductDataService.create(state, request.getVariants());
+
+        return savedState;
     }
 
     /**

@@ -82,7 +82,10 @@ public class ProductServiceImpl implements ProductService {
 
         if (request.getVariants().isEmpty()) {
 
-            List<AbstractItem> variants = product.getSubProducts().stream()
+            List<AbstractItem> variants = product.getStates().stream()
+                    .filter(state -> state.getStoreUid().equals(store.getUuid().toString()))
+                    .map(ProductData::getSubProducts)
+                    .flatMap(List::stream)
                     .map(SubProduct::getExternalId)
                     .map(AbstractItem::new)
                     .collect(Collectors.toList());

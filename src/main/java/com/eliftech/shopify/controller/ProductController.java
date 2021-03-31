@@ -54,8 +54,8 @@ public class ProductController {
     @PutMapping("/{productUid}")
     @ApiOperation("Update product by uuid")
     public ProductResponse update(@PathVariable @NotBlank String productUid,
-                       @RequestParam @NotBlank String storeName,
-                       @RequestBody @Valid UpdateProductRequest request) {
+                                  @RequestParam @NotBlank String storeName,
+                                  @RequestBody @Valid UpdateProductRequest request) {
 
         log.info("Request for update product by uuid:[{}] for store by name:[{}]", productUid,  storeName);
 
