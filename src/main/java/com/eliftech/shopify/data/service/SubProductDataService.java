@@ -80,7 +80,7 @@ public class SubProductDataService {
      * Update sub products
      * @param variantFormEntries
      */
-    protected void update(Map<String, Variant> variantFormEntries) { //TODO: call when update products
+    protected void update(Map<String, Variant> variantFormEntries) {
 
         log.info("Updating sub products by ids:{}", variantFormEntries.keySet());
 
