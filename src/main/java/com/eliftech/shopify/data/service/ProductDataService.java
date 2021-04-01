@@ -105,7 +105,7 @@ public class ProductDataService {
 
         Optional<Product> product = productRepository.findByHandle(handle);
 
-        log.info("...found:[{}]", product);
+        product.ifPresent(existProduct -> log.info("...found:[{}]", existProduct.getId()));
 
         return product;
     }
@@ -164,11 +164,7 @@ public class ProductDataService {
 
         Product product = this.findByUuid(productUid);
 
-        ProductData state = stateDataService.create(storeUid, product, request);
-
-        product.getStates().add(state);
-
-        productRepository.save(product);
+        stateDataService.create(storeUid, product, request);
     }
 
 
