@@ -80,6 +80,23 @@ public class SubProductDataService {
     }
 
     /**
+     * Find by external id
+     * @param externalId
+     * @return
+     */
+    public SubProduct findByExternalId(String externalId) {
+
+        log.info("Searching sub product by externalId:[{}]", externalId);
+
+        SubProduct subProduct = subProductRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new EntityNotFoundException("Not found sub product by externalId:["+ externalId +"]"));
+
+        log.info("...found:[{}]", subProduct.getId());
+
+        return subProduct;
+    }
+
+    /**
      *  Update sub products
      * @param product
      * @param productForm

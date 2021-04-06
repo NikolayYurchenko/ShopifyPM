@@ -1,12 +1,15 @@
 package com.eliftech.shopify.rest.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Data
 @AllArgsConstructor
@@ -91,7 +94,7 @@ public class ProductRestResponse implements Serializable {
 
     public static String parseNextBatchLinkAndFormat(String link) {
 
-        if (link.indexOf("next") > 0) {
+        if (link != null && link.indexOf("next") > 0) {
 
             int indexStart = link.indexOf(",");
 

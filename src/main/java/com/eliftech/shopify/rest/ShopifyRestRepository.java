@@ -2,23 +2,20 @@ package com.eliftech.shopify.rest;
 
 import com.eliftech.shopify.rest.exception.RestRequestException;
 import com.eliftech.shopify.rest.model.*;
-import com.sun.istack.Nullable;
-import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.util.UriBuilder;
 
-import javax.annotation.PostConstruct;
 import java.net.URI;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -29,33 +26,18 @@ public class ShopifyRestRepository extends BaseRestRepository {
     private String host;
 
     private final String AUTH_HEADER = "X-Shopify-Access-Token";
-    private final String PRODUCT_LIMIT = "70";
+    private final String PRODUCT_LIMIT = "250";
+    private final String ORDER_LIMIT = "250";
     private final String NEXT_BATCH_HEADER = "link";
 
     private final String PRODUCTS_POSTFIX = "products.json";
     private final String ORDERS_POSTFIX = "orders.json";
 
     private final String API_EXTENSION = ".json";
+    private final String START_DATE = "2000-01-01T13:14";
 
     private final Map<String, List<ProductRestResponse>> allProducts = new HashMap<>();
-
-//    @PostConstruct
-//    public void init() {
-//
-//        UpdateProductRequest request = new UpdateProductRequest();
-//        request.setBodyHtml("<p> My description</p>");
-//        request.setHandle("my handle");
-//        request.setProductType("my product type");
-//        request.setStatus(ProductStatus.ACTIVE.getStatusName());
-//        request.setTags("my tags");
-//        request.setVariants(Collections.emptyList());
-//        request.setVendor("my vendor");
-//        request.setTitle("My product");
-//        request.setVariants(List.of(new VariantUpdateRequest("37038798536863", "50", "Updating the Product SKU")));
-//
-//        this.updateProduct("test-eliftech-store", "5893179408543", new UpdateProductWrapper(request),
-//                "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");
-//    }
+    private final Map<String, List<OrderResponse>> allOrders = new HashMap<>();
 
     @SneakyThrows
     @SuppressWarnings("all")
@@ -83,7 +65,7 @@ public class ShopifyRestRepository extends BaseRestRepository {
 
             Optional<String> nextLinkForBatch = Optional.ofNullable(response.getHeaders().getFirst(NEXT_BATCH_HEADER));
 
-            this.getAnotherBatchIfNeed(nextLinkForBatch.orElse(null), password);
+            this.getAnotherBatchIfNeed(nextLinkForBatch.orElse(null), ProductListResponse.class, TargetType.PRODUCTS, password);
 
             return allProducts.values().stream().flatMap(List::stream).collect(Collectors.toList());
 
@@ -128,7 +110,7 @@ public class ShopifyRestRepository extends BaseRestRepository {
 
     @SneakyThrows
     @SuppressWarnings("all")
-    private void getAnotherBatchIfNeed(String linkForBatch, String password) {
+    private synchronized void getAnotherBatchIfNeed(String linkForBatch, Class classToCast, TargetType type, String password) {
 
         if (linkForBatch != null) {
 
@@ -141,17 +123,30 @@ public class ShopifyRestRepository extends BaseRestRepository {
 
                 linkForBatch = ProductRestResponse.formatNextBatchLink(linkForBatch);
 
-                ResponseEntity<ProductListResponse> response = super.executeSync(HttpMethod.GET, linkForBatch, null,  ProductListResponse.class, headers);
+                ResponseEntity<?> response = super.executeSync(HttpMethod.GET, linkForBatch, null,  classToCast, headers);
 
-                log.info("...receive response:[{}]", response.getBody().getProducts().size());
+                boolean batchForProducts = type.equals(TargetType.PRODUCTS);
+
+                response = batchForProducts
+                        ? ResponseEntity.of(Optional.of((ProductListResponse) response.getBody()))
+                        : ResponseEntity.of(Optional.of((OrderListResponse) response.getBody()));
+
+                log.info("...receive response:[{}]", response.getBody());
 
                 Optional<String> linkHeader = Optional.ofNullable(response.getHeaders().getFirst(NEXT_BATCH_HEADER));
 
                 String nextLinkForBatch = ProductRestResponse.parseNextBatchLinkAndFormat(linkHeader.orElse(null));
 
-                this.allProducts.put(linkForBatch, response.getBody().getProducts());
+                if (batchForProducts) {
 
-                this.getAnotherBatchIfNeed(nextLinkForBatch, password);
+                    this.allProducts.put(linkForBatch, ((ProductListResponse) response.getBody()).getProducts());
+
+                } else {
+
+                    this.allOrders.put(linkForBatch, ((OrderListResponse) response.getBody()).getOrders());
+                }
+
+                this.getAnotherBatchIfNeed(nextLinkForBatch, classToCast, type, password);
 
             } catch (Exception e) {
 
@@ -188,7 +183,45 @@ public class ShopifyRestRepository extends BaseRestRepository {
 
         } catch (Exception e) {
 
-            log.error("Something when wrong when try get inventories:[{}], cause:[{}]", e.getMessage());
+            log.error("Something when wrong when try update product:[{}], cause:[{}]", e.getMessage());
+
+            throw new RestRequestException(e.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @SuppressWarnings("all")
+    public List<OrderResponse> getOrders(String storeName, String dateMin, String password) {
+
+        try {
+
+            log.info("Sync orders after date:[{}]", dateMin);
+
+            URI fullPath = new URIBuilder()
+                    .setScheme("https")
+                    .setHost(storeName + "." + host + "/")
+                    .setPath(ORDERS_POSTFIX)
+                    .setParameter("created_at_min", dateMin != null ? dateMin : START_DATE)
+                    .build();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set(AUTH_HEADER, password);
+
+            ResponseEntity<OrderListResponse> response = super.executeSync(HttpMethod.GET, fullPath.toString(), null,  OrderListResponse.class, headers);
+
+            log.info("...receive response:[{}]", response.getBody().getOrders().size());
+
+            this.allOrders.put(fullPath.toString(), response.getBody().getOrders());
+
+            Optional<String> nextLinkForBatch = Optional.ofNullable(response.getHeaders().getFirst(NEXT_BATCH_HEADER));
+
+            this.getAnotherBatchIfNeed(nextLinkForBatch.orElse(null), OrderListResponse.class, TargetType.ORDERS, password);
+
+            return allOrders.values().stream().flatMap(List::stream).collect(Collectors.toList());
+
+        } catch (Exception e) {
+
+            log.error("Something when wrong when try get orders:[{}], cause:[{}]", e.getMessage());
 
             throw new RestRequestException(e.getMessage());
         }

@@ -35,6 +35,17 @@ shopify:
   rabbitmq:
     host: localhost
     port: 5672
+  sheets:
+    inputOption: USER_ENTERED
+    insertDataOption: INSERT_ROWS
+    sheetName: shopify
+    accessType: offline
+  tables:
+    first: 17RbMUwGAxX1Scdlbhjjmb3lnDOzdUJYYLvQpY76rSp0
+    second: 17RbMUwGAxX1Scdlbhjjmb3lnDOzdUJYYLvQpY76rSp0
+    third: 17RbMUwGAxX1Scdlbhjjmb3lnDOzdUJYYLvQpY76rSp0
+    fourth: 17RbMUwGAxX1Scdlbhjjmb3lnDOzdUJYYLvQpY76rSp0
+    fifth: 17RbMUwGAxX1Scdlbhjjmb3lnDOzdUJYYLvQpY76rSp0
 
 #  redis:
 #    url: ${REDIS_URI:redis://localhost:6379}

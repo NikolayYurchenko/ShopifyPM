@@ -9,4 +9,6 @@ import java.util.UUID;
 public interface SubProductRepository extends JpaRepository<SubProduct, Long> {
 
     Optional<SubProduct> findByUuid(UUID subProductUid);
+
+    Optional<SubProduct> findByExternalId(String subProductUid);
 }

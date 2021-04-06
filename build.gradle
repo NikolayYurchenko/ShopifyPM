@@ -6,7 +6,7 @@ plugins {
 
 group = 'com.eliftech'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
+sourceCompatibility = '14'
 
 configurations {
 	compileOnly {
@@ -36,6 +36,10 @@ dependencies {
 	implementation 'io.springfox:springfox-boot-starter:3.0.0'
 	implementation 'io.springfox:springfox-swagger2:3.0.0'
 	implementation 'io.springfox:springfox-swagger-ui:3.0.0'
+
+	compile 'com.google.api-client:google-api-client:1.30.4'
+	compile 'com.google.oauth-client:google-oauth-client-jetty:1.30.6'
+	compile 'com.google.apis:google-api-services-sheets:v4-rev581-1.25.0'
 
 	implementation 'org.apache.commons:commons-lang3:3.11'
 

@@ -24,6 +24,7 @@ public class AmqpConnectionConfig {
 
     public static final String SYNC_PRODUCTS_QUEUE = "shopify.products.sync";
     public static final String SYNC_SINGLE_PRODUCT_QUEUE = "shopify.product.single.sync";
+    public static final String SYNC_ORDERS_QUEUE = "shopify.orders.sync";
 
     @Bean
     ConnectionFactory connectionFactory() {
@@ -65,6 +66,11 @@ public class AmqpConnectionConfig {
     @Bean
     Queue productSingleSyncDirect() {
         return new Queue(SYNC_SINGLE_PRODUCT_QUEUE);
+    }
+
+    @Bean
+    Queue ordersSyncDirect() {
+        return new Queue(SYNC_ORDERS_QUEUE);
     }
 
     @Bean

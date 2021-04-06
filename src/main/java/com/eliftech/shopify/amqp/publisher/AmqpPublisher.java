@@ -35,4 +35,15 @@ public class AmqpPublisher {
             rabbitTemplate.convertAndSend(AmqpConnectionConfig.SYNC_SINGLE_PRODUCT_QUEUE, request);
         }
     }
+
+    /**
+     * Notify about orders sync
+     * @param storeName
+     */
+    public void notifyOrderSync(String storeName) {
+
+        log.info("Publish event to sync orders by store:[{}]", storeName);
+
+        rabbitTemplate.convertAndSend(AmqpConnectionConfig.SYNC_ORDERS_QUEUE, storeName);
+    }
 }
