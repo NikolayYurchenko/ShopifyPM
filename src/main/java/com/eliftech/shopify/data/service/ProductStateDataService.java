@@ -2,9 +2,8 @@ package com.eliftech.shopify.data.service;
 
 import com.eliftech.shopify.data.entity.Product;
 import com.eliftech.shopify.data.entity.ProductData;
-import com.eliftech.shopify.data.entity.Store;
 import com.eliftech.shopify.data.repository.ProductDataRepository;
-import com.eliftech.shopify.rest.model.Image;
+import com.eliftech.shopify.model.Image;
 import com.eliftech.shopify.rest.model.ProductRestResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,8 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -46,7 +43,7 @@ public class ProductStateDataService {
                 .description(request.getBodyHtml())
                 .title(request.getTitle())
                 .tags(request.getTags())
-                .images(request.getImages().stream().map(Image::getSrc).collect(Collectors.toList()))
+                .images(request.getImages().stream().map(Image::instance).collect(Collectors.toList()))
                 .status(request.getStatus())
                 .build();
 
@@ -79,7 +76,7 @@ public class ProductStateDataService {
 
         state.setTags(request.getTags());
 
-        state.setImages(request.getImages().stream().map(Image::getSrc).collect(Collectors.toList()));
+        state.setImages(request.getImages().stream().map(Image::instance).collect(Collectors.toList()));
 
         state.setStatus(request.getStatus());
 

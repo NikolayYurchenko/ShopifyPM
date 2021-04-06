@@ -1,5 +1,6 @@
 package com.eliftech.shopify.data.entity;
 
+import com.eliftech.shopify.model.Image;
 import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.*;
 import org.hibernate.annotations.Type;
@@ -9,7 +10,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Data
@@ -67,5 +67,5 @@ public class ProductData extends BaseEntity {
 
     @Type( type = "json" )
     @Column(name = "images", columnDefinition = "json")
-    private List<String> images;
+    private List<Image> images;
 }
