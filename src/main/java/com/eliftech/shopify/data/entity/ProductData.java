@@ -29,7 +29,7 @@ public class ProductData extends BaseEntity {
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Product product;
 
     @ToString.Exclude

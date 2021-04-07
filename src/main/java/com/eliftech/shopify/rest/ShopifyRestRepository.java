@@ -26,7 +26,7 @@ public class ShopifyRestRepository extends BaseRestRepository {
     private String host;
 
     private final String AUTH_HEADER = "X-Shopify-Access-Token";
-    private final String PRODUCT_LIMIT = "250";
+    private final String PRODUCT_LIMIT = "150";
     private final String ORDER_LIMIT = "250";
     private final String NEXT_BATCH_HEADER = "link";
 

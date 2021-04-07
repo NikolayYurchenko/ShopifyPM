@@ -3,12 +3,8 @@ package com.eliftech.shopify.data.service;
 import com.eliftech.shopify.data.entity.Product;
 import com.eliftech.shopify.data.entity.ProductData;
 import com.eliftech.shopify.data.entity.Store;
-import com.eliftech.shopify.data.entity.SubProduct;
 import com.eliftech.shopify.data.repository.ProductRepository;
-import com.eliftech.shopify.rest.model.Image;
-import com.eliftech.shopify.rest.model.Option;
 import com.eliftech.shopify.rest.model.ProductRestResponse;
-import com.eliftech.shopify.rest.model.Variant;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +13,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.*;
-import java.util.stream.Collector;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -164,7 +161,11 @@ public class ProductDataService {
 
         Product product = this.findByUuid(productUid);
 
-        stateDataService.create(storeUid, product, request);
+        ProductData state = stateDataService.create(storeUid, product, request);
+
+        product.getStates().add(state);
+
+        productRepository.save(product);
     }
 
 

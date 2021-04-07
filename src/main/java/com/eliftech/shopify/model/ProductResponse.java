@@ -1,13 +1,11 @@
 package com.eliftech.shopify.model;
 
-import com.eliftech.shopify.data.entity.Product;
 import com.eliftech.shopify.data.entity.ProductData;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,10 +33,13 @@ public class ProductResponse {
 
     private List<SubProductResponse> subProducts;
 
+    private List<Image> images;
+
     public static ProductResponse instance(String storeUid, ProductData product) {
 
         return ProductResponse.builder()
                 .storeUid(storeUid)
+                .images(product.getImages())
                 .id(product.getProduct().getSinceId())
                 .title(product.getTitle())
                 .bodyHtml(product.getDescription())
