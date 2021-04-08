@@ -84,7 +84,7 @@ public class OrderSheetRecord {
                 .styleAndSize(OptionalUtil.getConcatenatedOrEmpty(subProduct.getSize(), String.valueOf(subProduct.getWeight())))
                 .sku(sku)
                 .childName(OptionalUtil.getStringOrEmpty(subProduct.getTitle()))
-                .customerName(order.getShippingAddress().getName())
+                .customerName(OptionalUtil.formatName(order.getShippingAddress().getFirstName(), order.getShippingAddress().getLastName()))
                 .address(order.getShippingAddress().getCity() + ":" + order.getShippingAddress().getAddress1())
                 .quantity(String.valueOf(order.getLineItems().size()))
                 .color(OptionalUtil.getStringOrEmpty(subProduct.getColor()))

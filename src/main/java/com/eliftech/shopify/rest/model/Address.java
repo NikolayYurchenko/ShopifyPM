@@ -11,6 +11,10 @@ public class Address {
 
     private String address1;
 
+    private String firstName;
+
+    private String lastName;
+
     private String phone;
 
     private String city;
