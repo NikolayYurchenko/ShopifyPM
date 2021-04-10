@@ -1,5 +1,6 @@
 package com.eliftech.shopify.init;
 
+import com.eliftech.shopify.data.entity.User;
 import com.eliftech.shopify.data.service.UserDataService;
 import com.eliftech.shopify.init.util.StaticModelBuilder;
 import lombok.AllArgsConstructor;
@@ -10,17 +11,23 @@ import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
-@AllArgsConstructor(onConstructor = @__(@Autowired))
 @ConditionalOnProperty(value = "shopify.init.enabled")
 public class UserInitializer {
 
-    private final UserDataService userDataService;
+    @Autowired
+    private UserDataService userDataService;
 
     @EventListener(value = ApplicationStartedEvent.class)
     public void init() {
 
-        userDataService.create(StaticModelBuilder.getUser());
+        List<User> users = userDataService.findAll();
+
+        if (users.isEmpty()) {
+            userDataService.create(StaticModelBuilder.getUser());
+        }
     }
 }

@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))
@@ -15,6 +17,10 @@ public class UserDataService {
 
     private final UserRepository userRepository;
 
+    /**
+     * Create user
+     * @param request
+     */
     public void create(UserForm request) {
 
         log.info("Creating user from data:[{}]", request);
@@ -31,5 +37,16 @@ public class UserDataService {
                 .build();
 
         userRepository.save(user);
+    }
+
+    /**
+     * Find all users
+     * @return
+     */
+    public List<User> findAll() {
+
+        log.info("Searching all users");
+
+        return userRepository.findAll();
     }
 }

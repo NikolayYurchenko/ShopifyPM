@@ -1,36 +1,32 @@
 package com.eliftech.shopify.init;
 
-import com.eliftech.shopify.data.entity.Store;
-import com.eliftech.shopify.data.service.StoreDataService;
+import com.eliftech.shopify.data.entity.TableConfiguration;
+import com.eliftech.shopify.data.service.TableConfigurationDataService;
 import com.eliftech.shopify.init.util.StaticModelBuilder;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.core.metrics.ApplicationStartup;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Slf4j
-@Service
+@Component
 @ConditionalOnProperty(value = "shopify.init.enabled")
-public class StoreInitializer {
+public class TableConfigurationInitializer {
 
     @Autowired
-    private StoreDataService storeDataService;
+    private TableConfigurationDataService configurationDataService;
 
     @EventListener(value = ApplicationStartedEvent.class)
     public void init() {
 
-        log.info("Start init stores...");
+        List<TableConfiguration> configurations = configurationDataService.findAll();
 
-        List<Store> stores = storeDataService.findAll();
-
-        if (stores.isEmpty()) {
-            StaticModelBuilder.getStores().forEach(storeDataService::create);
+        if (configurations.isEmpty()) {
+            StaticModelBuilder.getTableConfig().forEach((factoryType, tableUid) -> configurationDataService.create(tableUid, factoryType));
         }
     }
 }

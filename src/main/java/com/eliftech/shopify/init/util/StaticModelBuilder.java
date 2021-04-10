@@ -1,10 +1,13 @@
 package com.eliftech.shopify.init.util;
 
+import com.eliftech.shopify.model.FactoryType;
 import com.eliftech.shopify.model.StoreForm;
 import com.eliftech.shopify.model.UserForm;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class StaticModelBuilder {
 
@@ -36,5 +39,18 @@ public class StaticModelBuilder {
                 .passwordResetKey("reset-key")
                 .role("admin")
                 .build();
+    }
+
+    public static Map<FactoryType, String> getTableConfig() {
+
+        Map<FactoryType, String> tableConfigEntries = new HashMap<>();
+
+        tableConfigEntries.put(FactoryType.FIRST, "17RbMUwGAxX1Scdlbhjjmb3lnDOzdUJYYLvQpY76rSp0");
+        tableConfigEntries.put(FactoryType.SECOND, "17RbMUwGAxX1Scdlbhjjmb3lnDOzdUJYYLvQpY76rSp0");
+        tableConfigEntries.put(FactoryType.THIRD, "17RbMUwGAxX1Scdlbhjjmb3lnDOzdUJYYLvQpY76rSp0");
+        tableConfigEntries.put(FactoryType.FOURTH, "17RbMUwGAxX1Scdlbhjjmb3lnDOzdUJYYLvQpY76rSp0");
+        tableConfigEntries.put(FactoryType.FIFTH, "17RbMUwGAxX1Scdlbhjjmb3lnDOzdUJYYLvQpY76rSp0");
+
+        return tableConfigEntries;
     }
 }

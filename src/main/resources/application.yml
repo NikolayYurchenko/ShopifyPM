@@ -23,32 +23,24 @@ spring:
       data-source-properties:
         useUnicode: true
         characterEncoding: UTF-8
-    url: jdbc:mysql://${MYSQL_HOST:localhost}:3309/shopify
-    username: abc
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/shopify
+    username: root
     password: 1234
 
 shopify:
   init:
-    enabled: false
+    enabled: ${INIT_ENABLED:true}
   rest:
     basePath: myshopify.com/admin/api/2021-01
   rabbitmq:
-    host: localhost
+    host: ${RABBITMQ_HOST:localhost}
     port: 5672
   sheets:
     inputOption: USER_ENTERED
     insertDataOption: INSERT_ROWS
     sheetName: shopify
     accessType: offline
-  tables:
-    first: 17RbMUwGAxX1Scdlbhjjmb3lnDOzdUJYYLvQpY76rSp0
-    second: 17RbMUwGAxX1Scdlbhjjmb3lnDOzdUJYYLvQpY76rSp0
-    third: 17RbMUwGAxX1Scdlbhjjmb3lnDOzdUJYYLvQpY76rSp0
-    fourth: 17RbMUwGAxX1Scdlbhjjmb3lnDOzdUJYYLvQpY76rSp0
-    fifth: 17RbMUwGAxX1Scdlbhjjmb3lnDOzdUJYYLvQpY76rSp0
 
-#  redis:
-#    url: ${REDIS_URI:redis://localhost:6379}
   jackson:
     default-property-inclusion: NON_EMPTY
     property-naming-strategy: SNAKE_CASE

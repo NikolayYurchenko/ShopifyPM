@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityNotFoundException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -54,5 +55,16 @@ public class StoreDataService {
         log.info("...found:[{}]", store);
 
         return store;
+    }
+
+    /**
+     * Find all stores
+     * @return
+     */
+    public List<Store> findAll() {
+
+        log.info("Searching all stores");
+
+        return storeRepository.findAll();
     }
 }

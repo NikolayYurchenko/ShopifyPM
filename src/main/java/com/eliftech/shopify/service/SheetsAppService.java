@@ -1,6 +1,8 @@
 package com.eliftech.shopify.service;
 
 import com.eliftech.shopify.config.SheetsStorageProperties;
+import com.eliftech.shopify.data.entity.TableConfiguration;
+import com.eliftech.shopify.data.service.TableConfigurationDataService;
 import com.eliftech.shopify.model.OrderSheetRecord;
 import com.eliftech.shopify.service.contract.GoogleApp;
 import com.google.api.client.auth.oauth2.Credential;
@@ -32,23 +34,11 @@ public class SheetsAppService implements GoogleApp {
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
     private static final String APP_NAME = "ShopifyPM";
 
-    @Value("${shopify.tables.first}")
-    private String firstTableUid;
-
-    @Value("${shopify.tables.second}")
-    private String secondTableUid;
-
-    @Value("${shopify.tables.third}")
-    private String thirdTableUid;
-
-    @Value("${shopify.tables.fourth}")
-    private String fourthTableUid;
-
-    @Value("${shopify.tables.fifth}")
-    private String fifthTableUid;
-
     @Autowired
     private SheetsStorageProperties sheetsStorageProperties;
+
+    @Autowired
+    private TableConfigurationDataService configurationDataService;
 
     @SneakyThrows
     @Override
@@ -81,16 +71,10 @@ public class SheetsAppService implements GoogleApp {
 
             try {
 
-                String tableUid = switch (record.getFactoryType()) {
-                    case FIRST -> this.firstTableUid;
-                    case SECOND -> this.secondTableUid;
-                    case THIRD -> this.thirdTableUid;
-                    case FOURTH -> this.fourthTableUid;
-                    case FIFTH -> this.fifthTableUid;
-                };
+                TableConfiguration configuration = configurationDataService.findByType(record.getFactoryType());
 
                 AppendValuesResponse appendBody = sheets.spreadsheets().values()
-                        .append(tableUid, sheetsStorageProperties.getSheetName(), dataBody)
+                        .append(configuration.getTableUid(), sheetsStorageProperties.getSheetName(), dataBody)
                         .setValueInputOption(sheetsStorageProperties.getInputOption())
                         .setInsertDataOption(sheetsStorageProperties.getInsertDataOption())
                         .setIncludeValuesInResponse(true)
