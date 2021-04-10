@@ -46,9 +46,11 @@ public class ProductServiceImpl implements ProductService {
 
             existProductByHandle.ifPresent(existProduct -> {
 
-                List<String> relatedStores = existProduct.getStores().stream().map(storeInfo -> store.getUuid().toString()).collect(Collectors.toList());
+                Optional<ProductData> alreadySyncedState = existProduct.getStates().stream()
+                        .filter(s -> s.getStoreUid().equals(store.getUuid().toString()))
+                        .findFirst();
 
-                if (!relatedStores.contains(store.getUuid().toString())) {
+                if (alreadySyncedState.isEmpty()) {
                     log.info("Product not sync for store:[{}]", store.getUuid());
                     productDataService.addState(store.getUuid().toString(), existProduct.getUuid().toString(), product);
                 }

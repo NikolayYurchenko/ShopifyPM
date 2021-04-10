@@ -36,8 +36,8 @@ public class ShopifyRestRepository extends BaseRestRepository {
     private final String API_EXTENSION = ".json";
     private final String START_DATE = "2000-01-01T13:14";
 
-    private final Map<String, List<ProductRestResponse>> allProducts = new HashMap<>();
-    private final Map<String, List<OrderResponse>> allOrders = new HashMap<>();
+    private  Map<String, List<ProductRestResponse>> allProducts = new HashMap<>();
+    private  Map<String, List<OrderResponse>> allOrders = new HashMap<>();
 
     @SneakyThrows
     @SuppressWarnings("all")
@@ -67,7 +67,11 @@ public class ShopifyRestRepository extends BaseRestRepository {
 
             this.getAnotherBatchIfNeed(nextLinkForBatch.orElse(null), ProductListResponse.class, TargetType.PRODUCTS, password);
 
-            return allProducts.values().stream().flatMap(List::stream).collect(Collectors.toList());
+            List<ProductRestResponse> products = allProducts.values().stream().flatMap(List::stream).collect(Collectors.toList());
+
+            allProducts = new HashMap<>();
+
+            return products;
 
         } catch (Exception e) {
 
@@ -217,7 +221,11 @@ public class ShopifyRestRepository extends BaseRestRepository {
 
             this.getAnotherBatchIfNeed(nextLinkForBatch.orElse(null), OrderListResponse.class, TargetType.ORDERS, password);
 
-            return allOrders.values().stream().flatMap(List::stream).collect(Collectors.toList());
+            List<OrderResponse> orders = allOrders.values().stream().flatMap(List::stream).collect(Collectors.toList());
+
+            allOrders = new HashMap<>();
+
+            return orders;
 
         } catch (Exception e) {
 
