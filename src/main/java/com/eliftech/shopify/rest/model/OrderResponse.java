@@ -63,15 +63,30 @@ public class OrderResponse {
 
           String number = NumberUtil.isNumeric(sku.substring(sku.indexOf("-") + 1))
                   ? sku.substring(sku.indexOf("-") + 1) : "1";
+          
+          FactoryType type;
+          
+          switch(number) {
+               
+               case "1":
+                    type = FactoryType.FIRST;
 
-          return switch(number) {
+               case "2":
+                    type = FactoryType.SECOND;
 
-               case "1" ->  FactoryType.FIRST;
-               case "2" ->  FactoryType.SECOND;
-               case "3" ->  FactoryType.THIRD;
-               case "4" ->  FactoryType.FOURTH;
-               case "5" ->  FactoryType.FIFTH;
-               default -> throw new IllegalStateException("Unexpected number parsed from sku: " + number);
-          };
+               case "3":
+                    type = FactoryType.THIRD;
+
+               case "4":
+                    type = FactoryType.FOURTH;
+
+               case "5":
+                    type = FactoryType.FIFTH;
+                    break;
+               default:
+                    throw new IllegalStateException("Unexpected value: " + number);
+          }
+
+          return type;
      }
 }

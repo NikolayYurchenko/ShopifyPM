@@ -1,6 +1,7 @@
 buildscript {
 	ext {
 		springBootVersion = '2.3.6.RELEASE'
+		dockerRegistryName = '26341'
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
@@ -17,8 +18,7 @@ plugins {
 }
 
 group = 'com.eliftech'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '14'
+sourceCompatibility = '11'
 
 configurations {
 	compileOnly {
@@ -75,11 +75,28 @@ task unpack(type: Copy) {
 }
 
 docker {
-	name "shopify"
-	tag "-${version}", "shopify:${version}"
-	tag "-latest", "shopify:latest"
+	name "${dockerRegistryName}/shopify"
+	tag "-${version}", "${dockerRegistryName}/shopify:${version}"
+	tag "-latest", "${dockerRegistryName}/shopify:latest"
 	copySpec.from(tasks.unpack.outputs).into("dependency")
 	buildArgs(['DEPENDENCY': "dependency"])
 	pull true
 	noCache true
+}
+
+task incrMinorVersion {
+	doFirst {
+		def v = version.toString().trim()
+		def minor = v.substring(v.lastIndexOf('.') + 1)
+		int m = minor.toInteger() + 1
+		def major = v.substring(0, v.lastIndexOf('.') + 1)
+		file("gradle.properties").text = "version=" + major + m
+	}
+}
+
+task getCurrentVersion {
+	doFirst {
+		def ver = version.toString().trim()
+		println ver.substring(ver.lastIndexOf('=') + 1)
+	}
 }

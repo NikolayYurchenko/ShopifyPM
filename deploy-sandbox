@@ -1,0 +1,13 @@
+#!/bin/bash
+
+./gradlew :incrMinorVersion || exit 1
+./gradlew :dockerTagsPush || exit 1
+
+VER=$(./gradlew -q :getCurrentVersion | tail -n 1)
+
+echo "Shopify  pushed with version [$VER] to SANDBOX docker registry"
+
+ssh -t ec2-user@ec2-3-123-154-134.eu-central-1.compute.amazonaws.com  "docker service update -d --image 26341/shopify eliftech_shopify_backend"
+
+ssh -t ec2-user@ec2-3-123-154-134.eu-central-1.compute.amazonaws.com  "docker service logs eliftech_shopify_backend -f --since 60s"
+
