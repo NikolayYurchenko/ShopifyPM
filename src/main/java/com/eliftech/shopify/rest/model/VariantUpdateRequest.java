@@ -8,8 +8,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class VariantUpdateRequest extends AbstractItem {
+public class VariantUpdateRequest  {
+
+    private String id;
 
     private String price;
 

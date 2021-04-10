@@ -3,6 +3,7 @@ package com.eliftech.shopify.service.contract;
 
 import com.eliftech.shopify.data.entity.Product;
 import com.eliftech.shopify.model.ProductResponse;
+import com.eliftech.shopify.model.ProductUpdateForm;
 import com.eliftech.shopify.rest.model.ProductRestResponse;
 import com.eliftech.shopify.rest.model.UpdateProductRequest;
 
@@ -31,7 +32,7 @@ public interface ProductService {
      * @param request
      * @return
      */
-    ProductResponse update(String storeName, String productUid, UpdateProductRequest request);
+    ProductResponse update(String storeName, String productUid, ProductUpdateForm request);
 
     /**
      * Find all products

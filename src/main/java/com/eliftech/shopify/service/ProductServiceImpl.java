@@ -7,6 +7,7 @@ import com.eliftech.shopify.data.entity.SubProduct;
 import com.eliftech.shopify.data.service.ProductDataService;
 import com.eliftech.shopify.data.service.StoreDataService;
 import com.eliftech.shopify.model.ProductResponse;
+import com.eliftech.shopify.model.ProductUpdateForm;
 import com.eliftech.shopify.rest.ShopifyRestRepository;
 import com.eliftech.shopify.rest.model.ProductRestResponse;
 import com.eliftech.shopify.rest.model.UpdateProductRequest;
@@ -77,28 +78,31 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse update(String storeName, String productUid, UpdateProductRequest request) {
+    public ProductResponse update(String storeName, String productUid, ProductUpdateForm request) {
 
         Store store = storeDataService.findByName(storeName);
 
         Product product = productDataService.findByUuid(productUid);
 
-        if (request.getVariants().isEmpty()) {
+        List<AbstractItem> subProductsDeclare =  product.getStates().stream()
+                .filter(state -> state.getStoreUid().equals(store.getUuid().toString()))
+                .map(ProductData::getSubProducts)
+                .flatMap(List::stream)
+                .map(SubProduct::getExternalId)
+                .map(AbstractItem::new)
+                .collect(Collectors.toList());
 
-            List<AbstractItem> variants = product.getStates().stream()
-                    .filter(state -> state.getStoreUid().equals(store.getUuid().toString()))
-                    .map(ProductData::getSubProducts)
-                    .flatMap(List::stream)
-                    .map(SubProduct::getExternalId)
-                    .map(AbstractItem::new)
-                    .collect(Collectors.toList());
+        subProductsDeclare.removeIf(variant -> request.getVariantIds().contains(variant.getId()));
 
-            request.setVariants(variants);
-        }
+        UpdateProductRequest updateRequest = UpdateProductRequest.instance(request);
 
-        ProductRestResponse restProduct = shopifyRestRepository.updateProduct(storeName, product.getSinceId(), request, store.getPassword());
+        updateRequest.getVariants().addAll(subProductsDeclare);
 
-        Product updatedProduct = productDataService.update(productUid, storeName, restProduct);
+        updateRequest.getVariants().addAll(request.getVariants());
+
+        ProductRestResponse restProduct = shopifyRestRepository.updateProduct(storeName, product.getSinceId(), updateRequest, subProductsDeclare, store.getPassword());
+
+        Product updatedProduct = productDataService.update(productUid, store.getUuid().toString(), restProduct);
 
         return ProductResponse.instance(store.getUuid().toString(), updatedProduct.getStateByStore(store.getUuid().toString()));
     }

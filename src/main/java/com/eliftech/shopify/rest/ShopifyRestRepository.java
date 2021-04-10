@@ -163,7 +163,7 @@ public class ShopifyRestRepository extends BaseRestRepository {
 
     @SneakyThrows
     @SuppressWarnings("all")
-    public ProductRestResponse updateProduct(String storeName, String productId, UpdateProductRequest request, String password) {
+    public ProductRestResponse updateProduct(String storeName, String productId, UpdateProductRequest request, List<AbstractItem> variantDeclares, String password) {
 
         try {
 
