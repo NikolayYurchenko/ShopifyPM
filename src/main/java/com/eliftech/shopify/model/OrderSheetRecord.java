@@ -1,7 +1,7 @@
 package com.eliftech.shopify.model;
 
 import com.eliftech.shopify.data.entity.SubProduct;
-import com.eliftech.shopify.rest.model.OrderResponse;
+import com.eliftech.shopify.rest.model.OrderRestResponse;
 import com.eliftech.shopify.service.OrderDictionary;
 import com.eliftech.shopify.util.OptionalUtil;
 import lombok.AllArgsConstructor;
@@ -74,7 +74,7 @@ public class OrderSheetRecord {
     private String remark = "";
 
 
-    public static OrderSheetRecord instance(OrderResponse order, SubProduct subProduct, String sku, FactoryType factoryType) {
+    public static OrderSheetRecord instance(OrderRestResponse order, SubProduct subProduct, String sku, FactoryType factoryType) {
 
         return OrderSheetRecord.builder()
                 .factoryType(factoryType)

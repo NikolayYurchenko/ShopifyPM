@@ -23,6 +23,9 @@ public class Order {
     @Column(name = "id", nullable = false, unique = true)
     private Long id;
 
+    @Column(name = "store_uid")
+    private String storeUid;
+
     @Column(name = "external_id")
     private String externalId;
 

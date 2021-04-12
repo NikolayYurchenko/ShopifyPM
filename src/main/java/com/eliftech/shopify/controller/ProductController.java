@@ -3,10 +3,7 @@ package com.eliftech.shopify.controller;
 import com.eliftech.shopify.amqp.publisher.AmqpPublisher;
 import com.eliftech.shopify.amqp.publisher.ProductSyncRequest;
 import com.eliftech.shopify.amqp.publisher.ProductSyncType;
-import com.eliftech.shopify.data.entity.Product;
 import com.eliftech.shopify.model.ProductResponse;
-import com.eliftech.shopify.model.ProductUpdateForm;
-import com.eliftech.shopify.rest.model.ProductRestResponse;
 import com.eliftech.shopify.rest.model.UpdateProductRequest;
 import com.eliftech.shopify.service.contract.ProductService;
 import io.swagger.annotations.Api;
@@ -56,7 +53,7 @@ public class ProductController {
     @ApiOperation("Update product by uuid")
     public ProductResponse update(@PathVariable @NotBlank String productUid,
                                   @RequestParam @NotBlank String storeName,
-                                  @RequestBody @Valid ProductUpdateForm request) {
+                                  @RequestBody @Valid UpdateProductRequest request) {
 
         log.info("Request for update product by uuid:[{}] for store by name:[{}]", productUid,  storeName);
 

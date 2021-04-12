@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,17 +36,9 @@ public class ProductUpdateForm {
     @NotBlank
     private String tags;
 
-//    private List<Image> images = Collections.emptyList();
-
     @NotBlank
     private String status;
 
-    private List<VariantUpdateRequest> variants = new ArrayList<>();
-
-    public List<String> getVariantIds() {
-
-        return this.variants.stream()
-                .map(VariantUpdateRequest::getId)
-                .collect(Collectors.toList());
-    }
+    @NotEmpty
+    private List<VariantUpdateRequest> variants;
 }

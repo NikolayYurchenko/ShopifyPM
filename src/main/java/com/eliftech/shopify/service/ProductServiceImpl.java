@@ -78,29 +78,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse update(String storeName, String productUid, ProductUpdateForm request) {
+    public ProductResponse update(String storeName, String productUid, UpdateProductRequest request) {
 
         Store store = storeDataService.findByName(storeName);
 
         Product product = productDataService.findByUuid(productUid);
 
-        List<AbstractItem> subProductsDeclare =  product.getStates().stream()
-                .filter(state -> state.getStoreUid().equals(store.getUuid().toString()))
-                .map(ProductData::getSubProducts)
-                .flatMap(List::stream)
-                .map(SubProduct::getExternalId)
-                .map(AbstractItem::new)
-                .collect(Collectors.toList());
-
-        subProductsDeclare.removeIf(variant -> request.getVariantIds().contains(variant.getId()));
-
-        UpdateProductRequest updateRequest = UpdateProductRequest.instance(request);
-
-        updateRequest.getVariants().addAll(subProductsDeclare);
-
-        updateRequest.getVariants().addAll(request.getVariants());
-
-        ProductRestResponse restProduct = shopifyRestRepository.updateProduct(storeName, product.getSinceId(), updateRequest, subProductsDeclare, store.getPassword());
+        ProductRestResponse restProduct = shopifyRestRepository.updateProduct(storeName, product.getSinceId(), request, store.getPassword());
 
         Product updatedProduct = productDataService.update(productUid, store.getUuid().toString(), restProduct);
 

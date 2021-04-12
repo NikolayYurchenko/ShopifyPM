@@ -32,7 +32,7 @@ public interface ProductService {
      * @param request
      * @return
      */
-    ProductResponse update(String storeName, String productUid, ProductUpdateForm request);
+    ProductResponse update(String storeName, String productUid, UpdateProductRequest request);
 
     /**
      * Find all products

@@ -37,7 +37,7 @@ public class ShopifyRestRepository extends BaseRestRepository {
     private final String START_DATE = "2000-01-01T13:14";
 
     private  Map<String, List<ProductRestResponse>> allProducts = new HashMap<>();
-    private  Map<String, List<OrderResponse>> allOrders = new HashMap<>();
+    private  Map<String, List<OrderRestResponse>> allOrders = new HashMap<>();
 
     @SneakyThrows
     @SuppressWarnings("all")
@@ -163,7 +163,7 @@ public class ShopifyRestRepository extends BaseRestRepository {
 
     @SneakyThrows
     @SuppressWarnings("all")
-    public ProductRestResponse updateProduct(String storeName, String productId, UpdateProductRequest request, List<AbstractItem> variantDeclares, String password) {
+    public ProductRestResponse updateProduct(String storeName, String productId, UpdateProductRequest request, String password) {
 
         try {
 
@@ -195,7 +195,7 @@ public class ShopifyRestRepository extends BaseRestRepository {
 
     @SneakyThrows
     @SuppressWarnings("all")
-    public List<OrderResponse> getOrders(String storeName, String dateMin, String password) {
+    public List<OrderRestResponse> getOrders(String storeName, String dateMin, String password) {
 
         try {
 
@@ -221,7 +221,7 @@ public class ShopifyRestRepository extends BaseRestRepository {
 
             this.getAnotherBatchIfNeed(nextLinkForBatch.orElse(null), OrderListResponse.class, TargetType.ORDERS, password);
 
-            List<OrderResponse> orders = allOrders.values().stream().flatMap(List::stream).collect(Collectors.toList());
+            List<OrderRestResponse> orders = allOrders.values().stream().flatMap(List::stream).collect(Collectors.toList());
 
             allOrders = new HashMap<>();
 

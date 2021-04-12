@@ -2,10 +2,12 @@ package com.eliftech.shopify.data.service;
 
 import com.eliftech.shopify.data.entity.Order;
 import com.eliftech.shopify.data.repository.OrderRepository;
-import com.eliftech.shopify.rest.model.OrderResponse;
+import com.eliftech.shopify.rest.model.OrderRestResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -23,14 +25,16 @@ public class OrderDataService {
     /**
      * Create orders
      * @param orderForms
+     * @param storeUid
      */
     @Transactional
-    public void create(List<OrderResponse> orderForms) {
+    public void create(List<OrderRestResponse> orderForms, String storeUid) {
 
         log.info("Creating:[{}] orders", orderForms.size());
 
         List<Order> orders = orderForms.stream().map(order ->
                 Order.builder()
+                .storeUid(storeUid)
                 .closedAt(order.getClosedAt())
                 .confirmed(order.isConfirmed())
                 .createdAt(order.getCreatedAt())
@@ -57,6 +61,24 @@ public class OrderDataService {
         orderRepository.saveAll(orders);
     }
 
+
+    /**
+     * Find all orders by store uuid
+     * @param storeUid
+     * @param page
+     * @param limit
+     * @return
+     */
+    public List<Order> findAllByStoreUid(String storeUid, int page, int limit) {
+
+        log.info("Searching orders by store uuid:[{}]", storeUid);
+
+        Page<Order> orders = orderRepository.findAllByStoreUid(storeUid, PageRequest.of(page, limit));
+
+        log.info("...found:[{}]", orders.getContent().size());
+
+        return orders.getContent();
+    }
 
     /**
      * Get last order created at date

@@ -1,14 +1,16 @@
 package com.eliftech.shopify.service;
 
+import com.eliftech.shopify.data.entity.Order;
 import com.eliftech.shopify.data.entity.Store;
 import com.eliftech.shopify.data.entity.SubProduct;
 import com.eliftech.shopify.data.service.OrderDataService;
 import com.eliftech.shopify.data.service.StoreDataService;
 import com.eliftech.shopify.data.service.SubProductDataService;
+import com.eliftech.shopify.model.OrderResponse;
 import com.eliftech.shopify.model.OrderSheetRecord;
 import com.eliftech.shopify.rest.ShopifyRestRepository;
 import com.eliftech.shopify.rest.model.OrderItem;
-import com.eliftech.shopify.rest.model.OrderResponse;
+import com.eliftech.shopify.rest.model.OrderRestResponse;
 import com.eliftech.shopify.service.contract.GoogleApp;
 import com.eliftech.shopify.service.contract.OrderService;
 import lombok.AllArgsConstructor;
@@ -41,9 +43,9 @@ public class OrderServiceImpl implements OrderService {
 
         Optional<String> lastOrderCreateDate = orderDataService.getCreatedAtFromLastOrder();
 
-        List<OrderResponse> orders = shopifyRestRepository.getOrders(storeName, lastOrderCreateDate.orElse(null), store.getPassword());
+        List<OrderRestResponse> orders = shopifyRestRepository.getOrders(storeName, lastOrderCreateDate.orElse(null), store.getPassword());
 
-        List<OrderResponse> availableForCreate = new ArrayList<>();
+        List<OrderRestResponse> availableForCreate = new ArrayList<>();
 
         orders.forEach(order -> {
 
@@ -71,6 +73,16 @@ public class OrderServiceImpl implements OrderService {
             googleApp.executeAction(records);
         });
 
-        orderDataService.create(availableForCreate);
+        orderDataService.create(availableForCreate, store.getUuid().toString());
+    }
+
+    @Override
+    public List<OrderResponse> findAll(String storeName, int page, int limit) {
+
+        Store store = storeDataService.findByName(storeName);
+
+        List<Order> orders = orderDataService.findAllByStoreUid(store.getUuid().toString(), page, limit);
+
+        return OrderResponse.instance(orders);
     }
 }

@@ -1,52 +1,44 @@
 package com.eliftech.shopify.rest.model;
 
-import com.eliftech.shopify.model.ProductUpdateForm;
+import com.eliftech.shopify.model.ImageRequest;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
-import java.util.ArrayList;
+import javax.validation.constraints.NotEmpty;
 import java.util.Collections;
 import java.util.List;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateProductRequest {
 
+    @NotBlank
     private String title;
 
+    @NotBlank
     private String bodyHtml;
 
+    @NotBlank
     private String vendor;
 
+    @NotBlank
     private String productType;
 
+    @NotBlank
     private String handle;
 
+    @NotBlank
     private String tags;
 
-//    private List<Image> images = Collections.emptyList();
+    @NotEmpty
+    private List<ImageRequest> images = Collections.emptyList();
 
+    @NotBlank
     private String status;
 
-    @Builder.Default
-    private List<Object> variants = new ArrayList<>();
-
-    public static UpdateProductRequest instance(ProductUpdateForm request) {
-
-        return UpdateProductRequest.builder()
-                .title(request.getTitle())
-                .bodyHtml(request.getBodyHtml())
-                .vendor(request.getVendor())
-                .productType(request.getProductType())
-                .handle(request.getHandle())
-                .tags(request.getTags())
-                .status(request.getStatus())
-                .variants(new ArrayList<>())
-                .build();
-    }
+    @NotEmpty
+    private List<VariantUpdateRequest> variants = Collections.emptyList();
 }

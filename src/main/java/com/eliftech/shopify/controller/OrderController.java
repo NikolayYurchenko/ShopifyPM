@@ -1,17 +1,19 @@
 package com.eliftech.shopify.controller;
 
 import com.eliftech.shopify.amqp.publisher.AmqpPublisher;
+import com.eliftech.shopify.model.OrderResponse;
+import com.eliftech.shopify.service.contract.OrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -21,6 +23,7 @@ import javax.validation.constraints.NotBlank;
 public class OrderController {
 
     private final AmqpPublisher amqpPublisher;
+    private final OrderService orderService;
 
     @PostMapping("/sync")
     @ApiOperation("Sync orders")
@@ -29,5 +32,16 @@ public class OrderController {
         log.info("Request for sync orders by store name:[{}]", storeName);
 
         amqpPublisher.notifyOrderSync(storeName);
+    }
+
+    @GetMapping
+    @ApiOperation("Find all orders")
+    public List<OrderResponse> findAll(@RequestParam @NotBlank String storeName,
+                                       @RequestParam@Min(0L)@Max(100L) int page,
+                                       @RequestParam @Min(1L) @Max(100L) int limit) {
+
+        log.info("Request for get orders by store name:[{}], ({}, {})", storeName, page, limit);
+
+        return orderService.findAll(storeName, page, limit);
     }
 }
