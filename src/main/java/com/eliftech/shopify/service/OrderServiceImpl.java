@@ -6,7 +6,6 @@ import com.eliftech.shopify.data.entity.SubProduct;
 import com.eliftech.shopify.data.service.OrderDataService;
 import com.eliftech.shopify.data.service.StoreDataService;
 import com.eliftech.shopify.data.service.SubProductDataService;
-import com.eliftech.shopify.model.FactoryType;
 import com.eliftech.shopify.model.OrderResponse;
 import com.eliftech.shopify.model.OrderSheetRecord;
 import com.eliftech.shopify.rest.ShopifyRestRepository;
@@ -54,9 +53,9 @@ public class OrderServiceImpl implements OrderService {
 
             List<OrderSheetRecord> records = new ArrayList<>();
 
-            List<FactoryType> factoryTypes = new ArrayList<>();
-
-            order.getLineItems().forEach(item -> factoryTypes.add(order.defineFactoryBySku(item.getSku())));
+//            List<FactoryType> factoryTypes = new ArrayList<>();
+//
+//            order.getLineItems().forEach(item -> factoryTypes.add(order.defineFactoryBySku(item.getSku())));
 
 //            boolean isNeedAddLetter = order.getLineItems().size() > 1 && factoryTypes.stream().reduce(())
 
@@ -69,7 +68,10 @@ public class OrderServiceImpl implements OrderService {
                     records.add(OrderSheetRecord
                             .instance(order, subProduct, orderItem.getSku(), order.defineFactoryBySku(orderItem.getSku())));
 
-                    availableForCreate.add(order);
+                    if (!availableForCreate.contains(order)) {
+
+                        availableForCreate.add(order);
+                    }
 
                 } catch (EntityNotFoundException e) {
 
