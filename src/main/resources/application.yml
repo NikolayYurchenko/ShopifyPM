@@ -1,6 +1,7 @@
 logging:
   level.root.: info
   level.com.eliftech: debug
+  config: /etc/eliftech/shopify/logback.xml
 
 server:
   port: 50000
