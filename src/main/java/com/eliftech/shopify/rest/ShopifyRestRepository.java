@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -199,13 +198,11 @@ public class ShopifyRestRepository extends BaseRestRepository {
 
             log.info("Sync orders after date:[{}]", dateMin);
 
-            Date date = dateMin != null ? new Date(dateMin) : null;
-
             URI fullPath = new URIBuilder()
                     .setScheme("https")
                     .setHost(storeName + "." + host + "/")
                     .setPath(ORDERS_POSTFIX)
-                    .setParameter("created_at_min", dateMin != null ? LocalDateTime.of(date.getYear(), date.getMonth(), date.getDay(), date.getHours(), date.getMinutes() + 1).toString() : START_DATE)
+                    .setParameter("created_at_min", dateMin != null ? dateMin : START_DATE)
                     .build();
 
             HttpHeaders headers = new HttpHeaders();
