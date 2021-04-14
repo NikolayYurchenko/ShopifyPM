@@ -46,7 +46,6 @@ public class ProductDataService {
                     .map(product -> Product.builder()
                             .uuid(UUID.randomUUID())
                             .handle(product.getHandle())
-                            .sinceId(product.getId())
                             .stores(List.of(store))
                             .build()).collect(Collectors.toList());
 
@@ -55,7 +54,7 @@ public class ProductDataService {
             List<Product> savedProducts = productRepository.saveAll(products);
 
             savedProducts.forEach(product ->
-                    stateDataService.create(storeUid, product, ProductRestResponse.filterBySinceId(productsForm, product.getSinceId()) ));
+                    stateDataService.create(storeUid, product, ProductRestResponse.filterByHandle(productsForm, product.getHandle()) ));
         }
     }
 
@@ -137,8 +136,6 @@ public class ProductDataService {
         Product product = this.findByUuid(productUid);
 
         product.setHandle(request.getHandle());
-
-        product.setSinceId(request.getId());
 
         Optional<ProductData> productData = product.getStates().stream().filter(state -> state.getStoreUid().equals(storeUid)).findFirst();
 

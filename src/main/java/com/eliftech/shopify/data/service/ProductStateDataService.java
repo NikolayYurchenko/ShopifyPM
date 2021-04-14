@@ -35,6 +35,7 @@ public class ProductStateDataService {
 
         ProductData state = ProductData.builder()
                 .uuid(UUID.randomUUID())
+                 .sinceId(request.getId())
                 .storeUid(storeUid)
                 .product(product)
                 .vendor(request.getVendor())
@@ -65,6 +66,8 @@ public class ProductStateDataService {
 
         ProductData state = productDataRepository.findByUuid(UUID.fromString(productDataUid))
                 .orElseThrow(() -> new EntityNotFoundException("Not found product state by uuid:["+ productDataUid +"]"));
+
+        state.setSinceId(request.getId());
 
         state.setVendor(request.getVendor());
 

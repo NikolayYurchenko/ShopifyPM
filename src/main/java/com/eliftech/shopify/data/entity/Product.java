@@ -26,9 +26,6 @@ public class Product extends  BaseEntity {
     @Column(name = "uuid", nullable = false, columnDefinition = "varchar(36) default ''")
     private UUID uuid;
 
-    @Column(name = "since_id")
-    private String sinceId;
-
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @Builder.Default

@@ -27,6 +27,9 @@ public class ProductData extends BaseEntity {
     @Column(name = "uuid", nullable = false, columnDefinition = "varchar(36) default ''")
     private UUID uuid;
 
+    @Column(name = "since_id")
+    private String sinceId;
+
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

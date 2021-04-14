@@ -3,15 +3,12 @@ package com.eliftech.shopify.service;
 import com.eliftech.shopify.data.entity.Product;
 import com.eliftech.shopify.data.entity.ProductData;
 import com.eliftech.shopify.data.entity.Store;
-import com.eliftech.shopify.data.entity.SubProduct;
 import com.eliftech.shopify.data.service.ProductDataService;
 import com.eliftech.shopify.data.service.StoreDataService;
 import com.eliftech.shopify.model.ProductResponse;
-import com.eliftech.shopify.model.ProductUpdateForm;
 import com.eliftech.shopify.rest.ShopifyRestRepository;
 import com.eliftech.shopify.rest.model.ProductRestResponse;
 import com.eliftech.shopify.rest.model.UpdateProductRequest;
-import com.eliftech.shopify.rest.model.AbstractItem;
 import com.eliftech.shopify.service.contract.ProductService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -72,7 +72,7 @@ public class ProductServiceImpl implements ProductService {
 
         Product product = productDataService.findByUuid(productUid);
 
-        ProductRestResponse productRest = shopifyRestRepository.getProductById(storeName, product.getSinceId(), store.getPassword());
+        ProductRestResponse productRest = shopifyRestRepository.getProductById(storeName, product.getStateByStore(store.getUuid().toString()).getSinceId(), store.getPassword());
 
         productDataService.refreshState(productUid, store.getUuid().toString(), productRest);
     }
@@ -84,7 +84,7 @@ public class ProductServiceImpl implements ProductService {
 
         Product product = productDataService.findByUuid(productUid);
 
-        ProductRestResponse restProduct = shopifyRestRepository.updateProduct(storeName, product.getSinceId(), request, store.getPassword());
+        ProductRestResponse restProduct = shopifyRestRepository.updateProduct(storeName, product.getStateByStore(store.getUuid().toString()).getSinceId(), request, store.getPassword());
 
         Product updatedProduct = productDataService.update(productUid, store.getUuid().toString(), restProduct);
 

@@ -40,7 +40,7 @@ public class ProductResponse {
         return ProductResponse.builder()
                 .storeUid(storeUid)
                 .images(product.getImages())
-                .id(product.getProduct().getSinceId())
+                .id(product.getSinceId())
                 .title(product.getTitle())
                 .bodyHtml(product.getDescription())
                 .handle(product.getProduct().getHandle())

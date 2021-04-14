@@ -104,11 +104,11 @@ public class ProductRestResponse implements Serializable {
         return null;
     }
 
-    public static ProductRestResponse filterBySinceId(List<ProductRestResponse> products, String sinceId) {
+    public static ProductRestResponse filterByHandle(List<ProductRestResponse> products, String handle) {
 
         return Objects.requireNonNull(products.stream()
-                        .filter(product -> product.getId().equals(sinceId))
+                        .filter(product -> product.getHandle().equals(handle))
                         .findFirst()
-                        .orElseThrow(() -> new IllegalStateException("Not found related product to product from shopify, since id:["+ sinceId +"]")));
+                        .orElseThrow(() -> new IllegalStateException("Not found related product to product from shopify, handle:["+ handle +"]")));
     }
 }
