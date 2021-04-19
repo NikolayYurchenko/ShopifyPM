@@ -1,7 +1,7 @@
 package com.eliftech.shopify.init;
 
-import com.eliftech.shopify.data.entity.User;
-import com.eliftech.shopify.data.service.UserDataService;
+import com.eliftech.shopify.data.entity.GoogleCredentials;
+import com.eliftech.shopify.data.service.GoogleCredentialsDataService;
 import com.eliftech.shopify.init.util.StaticModelBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,20 +15,20 @@ import java.util.List;
 @Slf4j
 @Service
 @ConditionalOnProperty(value = "shopify.init.enabled")
-public class UserInitializer {
+public class GoogleCredentialsInitializer {
 
     @Autowired
-    private UserDataService userDataService;
+    private GoogleCredentialsDataService credentialsDataService;
 
     @EventListener(value = ApplicationStartedEvent.class)
     public void init() {
 
-        log.info("Start init users...");
+        log.info("Start init google credentials...");
 
-        List<User> users = userDataService.findAll();
+        List<GoogleCredentials> credentials = credentialsDataService.findAll();
 
-        if (users.isEmpty()) {
-            userDataService.create(StaticModelBuilder.getUser());
+        if (credentials.isEmpty()) {
+            StaticModelBuilder.getGoogleCredentials().forEach((email, apiKey) -> credentialsDataService.create(email, apiKey));
         }
     }
 }

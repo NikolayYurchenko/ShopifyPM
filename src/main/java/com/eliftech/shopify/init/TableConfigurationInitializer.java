@@ -23,6 +23,8 @@ public class TableConfigurationInitializer {
     @EventListener(value = ApplicationStartedEvent.class)
     public void init() {
 
+        log.info("Start init table  configuration...");
+
         List<TableConfiguration> configurations = configurationDataService.findAll();
 
         if (configurations.isEmpty()) {

@@ -18,7 +18,6 @@ plugins {
 }
 
 group = 'com.eliftech'
-sourceCompatibility = '11'
 
 configurations {
 	compileOnly {
@@ -79,6 +78,11 @@ docker {
 	tag "-${version}", "${dockerRegistryName}/shopify:${version}"
 	tag "-latest", "${dockerRegistryName}/shopify:latest"
 	copySpec.from(tasks.unpack.outputs).into("dependency")
+	copy {
+
+		from "tokens/."
+		into "build/dependency/tokens"
+	}
 	buildArgs(['DEPENDENCY': "dependency"])
 	pull true
 	noCache true

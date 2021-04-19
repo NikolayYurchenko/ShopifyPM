@@ -53,4 +53,9 @@ public class StaticModelBuilder {
 
         return tableConfigEntries;
     }
+
+    public static Map<String, String> getGoogleCredentials() {
+
+        return Map.of("system-account@shopifypm.iam.gserviceaccount.com", "AIzaSyBsmTTPFPc2tJuIRI3f84az_WCcP4X0sWs");
+    }
 }
