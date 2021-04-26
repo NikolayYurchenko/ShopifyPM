@@ -1,7 +1,9 @@
 package com.eliftech.shopify.controller;
 
 import com.eliftech.shopify.amqp.publisher.AmqpPublisher;
+import com.eliftech.shopify.model.GoogleClientInfo;
 import com.eliftech.shopify.model.OrderResponse;
+import com.eliftech.shopify.service.contract.GoogleApp;
 import com.eliftech.shopify.service.contract.OrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -10,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -24,6 +27,17 @@ public class OrderController {
 
     private final AmqpPublisher amqpPublisher;
     private final OrderService orderService;
+    private final GoogleApp googleApp;
+
+
+    @PostMapping("/sheets/authorize")
+    @ApiOperation("Authorize for sheets")
+    public void authorizeForSheets(@Valid @RequestBody GoogleClientInfo clientInfo) {
+
+        log.info("Request for authorize for sheets");
+
+        googleApp.authorize(clientInfo);
+    }
 
     @PostMapping("/sync")
     @ApiOperation("Sync orders")

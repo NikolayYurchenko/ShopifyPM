@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @Slf4j
@@ -44,6 +45,22 @@ public class GoogleCredentialsDataService {
         List<GoogleCredentials> credentials = credentialsRepository.findAll();
 
         log.debug("...found:[{}]", credentials.size());
+
+        return credentials;
+    }
+
+    /**
+     * Find first google credentials
+     * @return
+     */
+    public GoogleCredentials findFirst() {
+
+        log.debug("Searching for first google credentials");
+
+        GoogleCredentials credentials = credentialsRepository.findTop1ByOrderByCreatedAt()
+                .orElseThrow(() -> new EntityNotFoundException("Not found any google credentials"));
+
+        log.debug("...found:[{}]", credentials);
 
         return credentials;
     }

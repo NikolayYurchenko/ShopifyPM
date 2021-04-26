@@ -1,5 +1,6 @@
 package com.eliftech.shopify.service.contract;
 
+import com.eliftech.shopify.model.GoogleClientInfo;
 import com.eliftech.shopify.model.OrderSheetRecord;
 import com.google.api.client.auth.oauth2.Credential;
 
@@ -9,10 +10,10 @@ public interface GoogleApp {
 
     /**
      * Authorize in google app
-     * @param resourcePath
+     * @param clientInfo
      * @return
      */
-    Credential authorize(String resourcePath);
+    Credential authorize(GoogleClientInfo clientInfo);
 
     /**
      * Execute action(e.g add data to google table)
