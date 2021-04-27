@@ -1,14 +1,10 @@
 package com.eliftech.shopify.rest;
 
-import com.eliftech.shopify.config.SheetsStorageProperties;
-import com.eliftech.shopify.data.entity.TableConfiguration;
 import com.eliftech.shopify.rest.exception.RestRequestException;
 import com.eliftech.shopify.rest.model.*;
-import com.google.api.services.sheets.v4.model.AppendValuesResponse;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.utils.URIBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -31,9 +27,6 @@ public class ShopifyRestRepository extends BaseRestRepository {
 
     @Value("${shopify.rest.sheets.basePath}")
     private String googleSheetsHost;
-
-    @Autowired
-    private SheetsStorageProperties sheetsStorageProperties;
 
     private final String AUTH_HEADER = "X-Shopify-Access-Token";
     private final String PRODUCT_LIMIT = "150";
@@ -241,47 +234,6 @@ public class ShopifyRestRepository extends BaseRestRepository {
         } catch (Exception e) {
 
             log.error("Something when wrong when try get orders:[{}], cause:[{}]", e.getMessage());
-
-            throw new RestRequestException(e.getMessage());
-        }
-    }
-
-    /**
-     * Append values to google sheet
-     * @param body
-     * @param tableConfiguration
-     * @param apiKey
-     * @return
-     */
-    @SneakyThrows
-    @SuppressWarnings("all")
-    public AppendValuesResponse appendValuesToSheet(List<List<Object>> body, TableConfiguration tableConfiguration, String apiKey) {
-
-        try {
-
-            log.info("Try add values:[{}] to table:[{}]", body, tableConfiguration.getTableUid());
-
-            URI fullPath = new URIBuilder()
-                    .setScheme("https")
-                    .setHost(this.googleSheetsHost)
-                    .setPath(tableConfiguration.getTableUid() + "/values/" + sheetsStorageProperties.getSheetName() + ":append")
-                    .setParameter("includeValuesInResponse", "true")
-                    .setParameter("insertDataOption", sheetsStorageProperties.getInsertDataOption())
-                    .setParameter("valueInputOption", sheetsStorageProperties.getInputOption())
-                    .build();
-
-            HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth(apiKey);
-
-            ResponseEntity<AppendValuesResponse> response = super.executeSync(HttpMethod.POST, fullPath.toString(), body,  AppendValuesResponse.class, headers);
-
-            log.info("...receive:[{}]", response.getBody().size());
-
-            return response.getBody();
-
-        } catch (Exception e) {
-
-            log.error("Something when wrong when try append values to table:[{}], cause:[{}]", tableConfiguration.getTableUid(), e.getMessage());
 
             throw new RestRequestException(e.getMessage());
         }
