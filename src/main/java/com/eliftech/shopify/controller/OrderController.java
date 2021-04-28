@@ -32,7 +32,7 @@ public class OrderController {
 
     @PostMapping("/sheets/authorize")
     @ApiOperation("Authorize for sheets")
-    public void authorizeForSheets(@Valid @RequestBody GoogleClientInfo clientInfo) {
+    public void authorizeForSheets(@RequestBody @Valid GoogleClientInfo clientInfo) {
 
         log.info("Request for authorize for sheets");
 
