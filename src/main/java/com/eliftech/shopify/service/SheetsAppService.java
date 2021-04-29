@@ -48,6 +48,7 @@ public class SheetsAppService implements GoogleApp {
             tokenResponse.setAccessToken(clientInfo.getAccessToken());
             tokenResponse.setExpiresInSeconds(clientInfo.getExpiresInSeconds());
             tokenResponse.setTokenType("Bearer");
+            tokenResponse.setRefreshToken("refreshToken");
             tokenResponse.setScope(SheetsScopes.SPREADSHEETS);
 
             return authFlow.createAndStoreCredential(tokenResponse, "user");
@@ -88,6 +89,8 @@ public class SheetsAppService implements GoogleApp {
             } catch (Exception e) {
 
                 log.info("Failed add data to table, cause:[{}]", e.getMessage());
+
+                throw new RuntimeException(e.getMessage());
             }
         });
     }

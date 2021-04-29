@@ -6,8 +6,7 @@ import com.eliftech.shopify.data.entity.SubProduct;
 import com.eliftech.shopify.data.service.OrderDataService;
 import com.eliftech.shopify.data.service.StoreDataService;
 import com.eliftech.shopify.data.service.SubProductDataService;
-import com.eliftech.shopify.model.OrderResponse;
-import com.eliftech.shopify.model.OrderSheetRecord;
+import com.eliftech.shopify.model.*;
 import com.eliftech.shopify.rest.ShopifyRestRepository;
 import com.eliftech.shopify.rest.model.OrderItem;
 import com.eliftech.shopify.rest.model.OrderRestResponse;
@@ -35,9 +34,10 @@ public class OrderServiceImpl implements OrderService {
     private final SubProductDataService subProductDataService;
     private final GoogleApp googleApp;
 
+
     @Override
     @Transactional
-    public void sync(String storeName) {
+    public AbstractApiResponse sync(String storeName) {
 
         Store store = storeDataService.findByName(storeName);
 
@@ -45,13 +45,29 @@ public class OrderServiceImpl implements OrderService {
 
         List<OrderRestResponse> orders = shopifyRestRepository.getOrders(storeName, lastOrderCreateDate.orElse(null), store.getPassword());
 
+        List<OrderSheetRecord> records = this.createOrders(orders, store.getUuid().toString());
+
+        try {
+
+            googleApp.executeAction(records);
+
+            return SuccessApiResponse.instance();
+
+        } catch (Exception e) {
+
+            return ForbiddenApiResponse.instance();
+        }
+    }
+
+    private  List<OrderSheetRecord> createOrders( List<OrderRestResponse> orders, String storeUid) {
+
         List<OrderRestResponse> availableForCreate = new ArrayList<>();
+
+        List<OrderSheetRecord> records = new ArrayList<>();
 
         orders.forEach(order -> {
 
             List<OrderItem> orderItems = order.getLineItems();
-
-            List<OrderSheetRecord> records = new ArrayList<>();
 
 //            List<FactoryType> factoryTypes = new ArrayList<>();
 //
@@ -59,30 +75,29 @@ public class OrderServiceImpl implements OrderService {
 
 //            boolean isNeedAddLetter = order.getLineItems().size() > 1 && factoryTypes.stream().reduce(())
 
-            orderItems.forEach(orderItem -> {
+             orderItems.forEach(orderItem -> {
 
-                try {
+                 try {
 
-                    SubProduct subProduct = subProductDataService.findByExternalId(orderItem.getVariantId());
+                     SubProduct subProduct = subProductDataService.findByExternalId(orderItem.getVariantId());
 
-                    records.add(OrderSheetRecord
-                            .instance(order, subProduct, orderItem.getSku(), order.defineFactoryBySku(orderItem.getSku())));
+                     records.add(OrderSheetRecord
+                              .instance(order, subProduct, orderItem.getSku(), order.defineFactoryBySku(orderItem.getSku())));
 
-                    if (!availableForCreate.contains(order)) {
+                     if (!availableForCreate.contains(order)) {
+                          availableForCreate.add(order);
+                      }
 
-                        availableForCreate.add(order);
-                    }
+                 } catch (EntityNotFoundException e) {
 
-                } catch (EntityNotFoundException e) {
-
-                    log.info(e.getMessage());
-                }
+                         log.info(e.getMessage());
+                 }
             });
-
-            googleApp.executeAction(records);
         });
 
-        orderDataService.create(availableForCreate, store.getUuid().toString());
+       orderDataService.create(availableForCreate, storeUid);
+
+       return records;
     }
 
     @Override

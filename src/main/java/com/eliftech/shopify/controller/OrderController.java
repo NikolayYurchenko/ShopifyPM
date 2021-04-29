@@ -1,6 +1,6 @@
 package com.eliftech.shopify.controller;
 
-import com.eliftech.shopify.amqp.publisher.AmqpPublisher;
+import com.eliftech.shopify.model.AbstractApiResponse;
 import com.eliftech.shopify.model.GoogleClientInfo;
 import com.eliftech.shopify.model.OrderResponse;
 import com.eliftech.shopify.service.contract.GoogleApp;
@@ -25,7 +25,6 @@ import java.util.List;
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class OrderController {
 
-    private final AmqpPublisher amqpPublisher;
     private final OrderService orderService;
     private final GoogleApp googleApp;
 
@@ -41,17 +40,17 @@ public class OrderController {
 
     @PostMapping("/sync")
     @ApiOperation("Sync orders")
-    public void sync(@RequestParam @NotBlank String storeName) {
+    public AbstractApiResponse sync(@RequestParam @NotBlank String storeName) {
 
         log.info("Request for sync orders by store name:[{}]", storeName);
 
-        amqpPublisher.notifyOrderSync(storeName);
+        return orderService.sync(storeName);
     }
 
     @GetMapping
     @ApiOperation("Find all orders")
     public List<OrderResponse> findAll(@RequestParam @NotBlank String storeName,
-                                       @RequestParam@Min(0L)@Max(100L) int page,
+                                       @RequestParam @Min(0L) @Max(100L) int page,
                                        @RequestParam @Min(1L) @Max(100L) int limit) {
 
         log.info("Request for get orders by store name:[{}], ({}, {})", storeName, page, limit);

@@ -3,12 +3,10 @@ package com.eliftech.shopify.amqp.listener;
 
 import com.eliftech.shopify.amqp.publisher.ProductSyncRequest;
 import com.eliftech.shopify.config.AmqpConnectionConfig;
-import com.eliftech.shopify.model.AbstractApiResponse;
-import com.eliftech.shopify.model.ForbiddenApiResponse;
-import com.eliftech.shopify.model.SuccessApiResponse;
 import com.eliftech.shopify.service.contract.OrderService;
 import com.eliftech.shopify.service.contract.ProductService;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @AllArgsConstructor(onConstructor = @__(@Autowired))
-public class ProductsEventListener {
+public class AmqpListener {
 
     private final ProductService productService;
     private final OrderService orderService;
@@ -52,8 +50,9 @@ public class ProductsEventListener {
         }
     }
 
+    @SneakyThrows
     @RabbitListener(queues = AmqpConnectionConfig.SYNC_ORDERS_QUEUE)
-    public AbstractApiResponse handleOrdersSync(String storeName) {
+    public void handleOrdersSync(String storeName) {
 
         try {
 
@@ -61,13 +60,9 @@ public class ProductsEventListener {
 
             orderService.sync(storeName);
 
-            return SuccessApiResponse.instance();
-
         } catch (Exception e) {
 
             log.error("Failed sync orders from store:[{}], cause:[{}]", storeName, e.getMessage());
-
-            return ForbiddenApiResponse.instance();
         }
     }
 }
