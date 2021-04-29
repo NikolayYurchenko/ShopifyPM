@@ -2,6 +2,8 @@ package com.eliftech.shopify.util;
 
 import com.eliftech.shopify.model.FactoryType;
 
+import java.util.List;
+
 public class OrderUtil {
 
     public static FactoryType defineFactoryBySku(String sku) {
@@ -37,5 +39,10 @@ public class OrderUtil {
         }
 
         return type;
+    }
+
+    public static List<String> getStaticCountries() {
+
+        return List.of("New Zealand", "Australia");
     }
 }

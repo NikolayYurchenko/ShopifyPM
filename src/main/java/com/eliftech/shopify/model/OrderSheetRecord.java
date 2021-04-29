@@ -4,6 +4,8 @@ import com.eliftech.shopify.data.entity.SubProduct;
 import com.eliftech.shopify.rest.model.OrderRestResponse;
 import com.eliftech.shopify.service.OrderDictionary;
 import com.eliftech.shopify.util.OptionalUtil;
+import com.eliftech.shopify.util.OrderUtil;
+import com.google.api.services.sheets.v4.model.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -83,13 +85,13 @@ public class OrderSheetRecord {
                 .factoryType(factoryType)
                 .externalId(order.getId())
                 .barCode(OptionalUtil.getStringOrEmpty(subProduct.getBarcode()))
-                .orderNumber(addLetter? order.getId() + OrderDictionary.getLetterDependOnFactoryType(factoryType) : order.getName())
+                .orderNumber(addLetter? order.getId() + OrderDictionary.getLetterDependOnFactoryType(factoryType) : order.getId())
                 .entryDate(order.getCreatedAt())
                 .styleAndSize(OptionalUtil.getConcatenatedOrEmpty(subProduct.getSize(), String.valueOf(subProduct.getWeight())))
                 .sku(sku)
                 .childName(OptionalUtil.getStringOrEmpty(subProduct.getTitle()))
                 .customerName(OptionalUtil.formatName(order.getShippingAddress().getFirstName(), order.getShippingAddress().getLastName()))
-                .address(order.getShippingAddress().getCity() + ":" + order.getShippingAddress().getAddress1())
+                .address(order.getShippingAddress().getCountry() + ":" + order.getShippingAddress().getCity() + ":" + order.getShippingAddress().getAddress1())
                 .quantity(String.valueOf(order.getLineItems().size()))
                 .color(OptionalUtil.getStringOrEmpty(subProduct.getColor()))
                 .notes(OptionalUtil.getStringOrEmpty(order.getNote()))
@@ -105,7 +107,14 @@ public class OrderSheetRecord {
                         this.barCode, this.color, this.childName, this.customerName,
                         this.quantity, this.quantitySend, this.estimatedDelivery,
                         this.sendDate, this.invoiceNumber,
-                        this.address, this.notes, this.remark)
+                        OrderUtil.getStaticCountries().contains(this.address.substring(0, this.address.indexOf(":")))
+                                ? new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(this.address)).setUserEnteredFormat(new CellFormat().setBackgroundColor(new Color()
+                                    .setRed(Float.valueOf("1"))
+                                    .setGreen(Float.valueOf("0"))
+                                    .setBlue(Float.valueOf("0"))))
+                                  .setUserEnteredFormat(new CellFormat().setTextFormat(new TextFormat())).toString()
+                                : this.address,
+                        this.notes, this.remark)
         );
     }
 }
