@@ -12,5 +12,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     Optional<Order> findTop1ByOrderByCreatedAtDesc();
 
+    List<Order> findByExternalIdIn(List<String> externalIds);
+
     Page<Order> findAllByStoreUid(String storeUid, Pageable pageable);
 }

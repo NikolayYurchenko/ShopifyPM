@@ -20,6 +20,9 @@ public class OrderSheetRecord {
     private FactoryType factoryType;
 
     @Builder.Default
+    private String externalId = "";
+
+    @Builder.Default
     private String orderNumber = "";
 
     @Builder.Default
@@ -78,6 +81,7 @@ public class OrderSheetRecord {
 
         return OrderSheetRecord.builder()
                 .factoryType(factoryType)
+                .externalId(order.getId())
                 .barCode(OptionalUtil.getStringOrEmpty(subProduct.getBarcode()))
                 .orderNumber(order.getName() + OrderDictionary.getLetterDependOnFactoryType(factoryType))
                 .entryDate(order.getCreatedAt())

@@ -30,7 +30,7 @@ public class OrderDataService {
     @Transactional
     public void create(List<OrderRestResponse> orderForms, String storeUid) {
 
-        log.info("Creating:[{}] orders", orderForms.size());
+        log.debug("Creating:[{}] orders", orderForms.size());
 
         List<Order> orders = orderForms.stream().map(order ->
                 Order.builder()
@@ -71,7 +71,7 @@ public class OrderDataService {
      */
     public List<Order> findAllByStoreUid(String storeUid, int page, int limit) {
 
-        log.info("Searching orders by store uuid:[{}]", storeUid);
+        log.debug("Searching orders by store uuid:[{}]", storeUid);
 
         Page<Order> orders = orderRepository.findAllByStoreUid(storeUid, PageRequest.of(page, limit));
 
@@ -86,10 +86,26 @@ public class OrderDataService {
      */
     public Optional<String> getCreatedAtFromLastOrder() {
 
-        log.info("Getting created at from last order");
+        log.debug("Getting created at from last order");
 
         Optional<Order> order = orderRepository.findTop1ByOrderByCreatedAtDesc();
 
         return order.map(Order::getCreatedAt);
+    }
+
+    /**
+     * Find order by external id
+     * @param externalIds
+     * @return
+     */
+    public List<Order> findByExternalIds(List<String> externalIds) {
+
+        log.debug("Searching orders by external ids:{}", externalIds);
+
+        List<Order> orders = orderRepository.findByExternalIdIn(externalIds);
+
+        log.debug("...found:[{}]", orders.size());
+
+        return orders;
     }
 }

@@ -81,7 +81,7 @@ docker {
 	copySpec.from(tasks.unpack.outputs).into("dependency")
 	copy {
 
-		from "tokens/."
+		from "bin/tokens/."
 		into "build/dependency/tokens"
 	}
 	buildArgs(['DEPENDENCY': "dependency"])

@@ -19,7 +19,7 @@ import java.util.List;
 @Configuration
 public class GoogleConfig {
 
-    private final static String TOKENS_DIRECTORY_PATH = "tokens";
+    private final static String TOKENS_DIRECTORY_PATH = "bin/tokens";
 
     @Bean
     @SneakyThrows

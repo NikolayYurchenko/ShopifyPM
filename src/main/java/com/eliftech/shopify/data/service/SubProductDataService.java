@@ -84,14 +84,13 @@ public class SubProductDataService {
      * @param externalId
      * @return
      */
-    public SubProduct findByExternalId(String externalId) {
+    public Optional<SubProduct> findByExternalId(String externalId) {
 
         log.info("Searching sub product by externalId:[{}]", externalId);
 
-        SubProduct subProduct = subProductRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new EntityNotFoundException("Not found sub product by externalId:["+ externalId +"]"));
+        Optional<SubProduct> subProduct = subProductRepository.findByExternalId(externalId);
 
-        log.info("...found:[{}]", subProduct.getId());
+        subProduct.ifPresent(subProductItem -> log.info("...found:[{}]", subProductItem.getId()));;
 
         return subProduct;
     }
