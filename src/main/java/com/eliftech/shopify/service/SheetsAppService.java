@@ -82,6 +82,7 @@ public class SheetsAppService implements GoogleApp {
                         .setValueInputOption(sheetsStorageProperties.getInputOption())
                         .setInsertDataOption(sheetsStorageProperties.getInsertDataOption())
                         .setIncludeValuesInResponse(true)
+                        .setPrettyPrint(true)
                         .execute();
 
                 log.info("Just added to google sheets:[{}]", appendBody);

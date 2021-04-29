@@ -55,11 +55,14 @@ public class OrderServiceImpl implements OrderService {
 
             Optional<SubProduct> subProduct = subProductDataService.findByExternalId(orderItem.getVariantId());
 
-            if (subProduct.isPresent() && !existingOrdersIds.contains(order.getId()))
+            boolean isAlreadyAdded = records.stream().map(OrderSheetRecord::getExternalId).collect(Collectors.toList()).contains(order.getId());
 
-            subProduct.ifPresent(subProductItem ->
-                    records.add(OrderSheetRecord
-                     .instance(order, subProductItem, orderItem.getSku(), order.defineFactoryBySku(orderItem.getSku()))));
+            if (subProduct.isPresent() && !isAlreadyAdded && !existingOrdersIds.contains(order.getId())) {
+
+                records.add(OrderSheetRecord
+                        .instance(order, subProduct.get(), orderItem.getSku(), order.defineFactoryBySku(orderItem.getSku())));
+            }
+
         }));
 
         try {
