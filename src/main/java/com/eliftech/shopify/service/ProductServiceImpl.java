@@ -54,6 +54,9 @@ public class ProductServiceImpl implements ProductService {
                 if (alreadySyncedState.isEmpty()) {
                     log.info("Product not sync for store:[{}]", store.getUuid());
                     productDataService.addState(store.getUuid().toString(), existProduct.getUuid().toString(), product);
+
+                } else {
+                    productDataService.update(existProduct.getUuid().toString(), store.getUuid().toString(), product);
                 }
 
                 existStates.add(product.getId());
