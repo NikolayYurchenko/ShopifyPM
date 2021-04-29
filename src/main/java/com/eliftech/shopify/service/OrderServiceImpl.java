@@ -8,9 +8,11 @@ import com.eliftech.shopify.data.service.StoreDataService;
 import com.eliftech.shopify.data.service.SubProductDataService;
 import com.eliftech.shopify.model.*;
 import com.eliftech.shopify.rest.ShopifyRestRepository;
+import com.eliftech.shopify.rest.model.OrderItem;
 import com.eliftech.shopify.rest.model.OrderRestResponse;
 import com.eliftech.shopify.service.contract.GoogleApp;
 import com.eliftech.shopify.service.contract.OrderService;
+import com.eliftech.shopify.util.OrderUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -51,19 +54,27 @@ public class OrderServiceImpl implements OrderService {
                     .collect(Collectors.toList()))
                 .stream().map(Order::getExternalId).collect(Collectors.toList());
 
-        orders.forEach(order -> order.getLineItems().forEach(orderItem -> {
+        orders.forEach(order -> {
 
-            Optional<SubProduct> subProduct = subProductDataService.findByExternalId(orderItem.getVariantId());
+            List<OrderItem> orderItems = order.getLineItems();
 
-            boolean isAlreadyAdded = records.stream().map(OrderSheetRecord::getExternalId).collect(Collectors.toList()).contains(order.getId());
+            Set<FactoryType> factoryTypes = orderItems.stream().map(OrderItem::getSku).map(OrderUtil::defineFactoryBySku).collect(Collectors.toSet());
 
-            if (subProduct.isPresent() && !isAlreadyAdded && !existingOrdersIds.contains(order.getId())) {
+            orderItems.forEach(orderItem -> {
 
-                records.add(OrderSheetRecord
-                        .instance(order, subProduct.get(), orderItem.getSku(), order.defineFactoryBySku(orderItem.getSku())));
-            }
+                Optional<SubProduct> subProduct = subProductDataService.findByExternalId(orderItem.getVariantId());
 
-        }));
+                boolean isAlreadyAdded = records.stream().map(OrderSheetRecord::getExternalId).collect(Collectors.toList()).contains(order.getId());
+
+                boolean isNeedAddLetter = factoryTypes.size() > 1;
+
+                if (subProduct.isPresent() && !isAlreadyAdded && !existingOrdersIds.contains(order.getId())) {
+
+                    records.add(OrderSheetRecord
+                            .instance(order, subProduct.get(), orderItem.getSku(), OrderUtil.defineFactoryBySku(orderItem.getSku()), isNeedAddLetter));
+                }
+            });
+        });
 
         try {
 

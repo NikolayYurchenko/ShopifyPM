@@ -1,7 +1,5 @@
 package com.eliftech.shopify.rest.model;
 
-import com.eliftech.shopify.model.FactoryType;
-import com.eliftech.shopify.util.NumberUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -58,35 +56,4 @@ public class OrderRestResponse {
      private Address shippingAddress;
 
      private List<OrderItem> lineItems;
-
-     public FactoryType defineFactoryBySku(String sku) {
-
-          String number = NumberUtil.isNumeric(sku.substring(sku.indexOf("-") + 1))
-                  ? sku.substring(sku.indexOf("-") + 1) : "1";
-          
-          FactoryType type;
-          
-          switch(number) {
-               
-               case "1":
-                    type = FactoryType.FIRST;
-
-               case "2":
-                    type = FactoryType.SECOND;
-
-               case "3":
-                    type = FactoryType.THIRD;
-
-               case "4":
-                    type = FactoryType.FOURTH;
-
-               case "5":
-                    type = FactoryType.FIFTH;
-                    break;
-               default:
-                    throw new IllegalStateException("Unexpected value: " + number);
-          }
-
-          return type;
-     }
 }

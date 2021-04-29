@@ -77,13 +77,13 @@ public class OrderSheetRecord {
     private String remark = "";
 
 
-    public static OrderSheetRecord instance(OrderRestResponse order, SubProduct subProduct, String sku, FactoryType factoryType) {
+    public static OrderSheetRecord instance(OrderRestResponse order, SubProduct subProduct, String sku, FactoryType factoryType, boolean addLetter) {
 
         return OrderSheetRecord.builder()
                 .factoryType(factoryType)
                 .externalId(order.getId())
                 .barCode(OptionalUtil.getStringOrEmpty(subProduct.getBarcode()))
-                .orderNumber(order.getName() + OrderDictionary.getLetterDependOnFactoryType(factoryType))
+                .orderNumber(addLetter? order.getId() + OrderDictionary.getLetterDependOnFactoryType(factoryType) : order.getName())
                 .entryDate(order.getCreatedAt())
                 .styleAndSize(OptionalUtil.getConcatenatedOrEmpty(subProduct.getSize(), String.valueOf(subProduct.getWeight())))
                 .sku(sku)
