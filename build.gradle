@@ -54,6 +54,7 @@ dependencies {
 	implementation 'com.google.apis:google-api-services-oauth2:v2-rev141-1.25.0'
 
 	implementation 'org.apache.commons:commons-lang3:3.11'
+	implementation 'org.apache.httpcomponents:httpclient:4.5.13'
 
 	runtimeOnly 'mysql:mysql-connector-java'
 

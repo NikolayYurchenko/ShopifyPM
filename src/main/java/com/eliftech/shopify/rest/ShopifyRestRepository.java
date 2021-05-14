@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -24,9 +25,6 @@ public class ShopifyRestRepository extends BaseRestRepository {
 
     @Value("${shopify.rest.basePath}")
     private String host;
-
-    @Value("${shopify.rest.sheets.basePath}")
-    private String googleSheetsHost;
 
     private final String AUTH_HEADER = "X-Shopify-Access-Token";
     private final String PRODUCT_LIMIT = "150";
@@ -128,32 +126,35 @@ public class ShopifyRestRepository extends BaseRestRepository {
 
             try {
 
-                linkForBatch = ProductRestResponse.formatNextBatchLink(linkForBatch);
+                linkForBatch = ProductRestResponse.parseNextBatchLinkAndFormat(linkForBatch);
 
-                ResponseEntity<?> response = super.executeSync(HttpMethod.GET, linkForBatch, null,  classToCast, headers);
+                if (linkForBatch != null) {
 
-                boolean batchForProducts = type.equals(TargetType.PRODUCTS);
+                    ResponseEntity<?> response = super.executeSync(HttpMethod.GET, linkForBatch, null, classToCast, headers);
 
-                response = batchForProducts
-                        ? ResponseEntity.of(Optional.of((ProductListResponse) response.getBody()))
-                        : ResponseEntity.of(Optional.of((OrderListResponse) response.getBody()));
+                    boolean batchForProducts = type.equals(TargetType.PRODUCTS);
 
-                log.info("...receive response:[{}]", response.getBody());
+                    response = batchForProducts
+                            ? ResponseEntity.of(Optional.of((ProductListResponse) response.getBody()))
+                            : ResponseEntity.of(Optional.of((OrderListResponse) response.getBody()));
 
-                Optional<String> linkHeader = Optional.ofNullable(response.getHeaders().getFirst(NEXT_BATCH_HEADER));
+                    log.info("...receive response:[{}]", response.getBody());
 
-                String nextLinkForBatch = ProductRestResponse.parseNextBatchLinkAndFormat(linkHeader.orElse(null));
+                    Optional<String> linkHeader = Optional.ofNullable(response.getHeaders().getFirst(NEXT_BATCH_HEADER));
 
-                if (batchForProducts) {
+                    String nextLinkForBatch = ProductRestResponse.parseNextBatchLinkAndFormat(linkHeader.orElse(null));
 
-                    this.allProducts.put(linkForBatch, ((ProductListResponse) response.getBody()).getProducts());
+                    if (batchForProducts) {
 
-                } else {
+                        this.allProducts.put(linkForBatch, ((ProductListResponse) response.getBody()).getProducts());
 
-                    this.allOrders.put(linkForBatch, ((OrderListResponse) response.getBody()).getOrders());
+                    } else {
+
+                        this.allOrders.put(linkForBatch, ((OrderListResponse) response.getBody()).getOrders());
+                    }
+
+                    this.getAnotherBatchIfNeed(nextLinkForBatch, classToCast, type, password);
                 }
-
-                this.getAnotherBatchIfNeed(nextLinkForBatch, classToCast, type, password);
 
             } catch (Exception e) {
 
@@ -198,7 +199,7 @@ public class ShopifyRestRepository extends BaseRestRepository {
 
     @SneakyThrows
     @SuppressWarnings("all")
-    public List<OrderRestResponse> getOrders(String storeName, String dateMin, String password) {
+    public List<OrderRestResponse> getOrdersAfterSpecificDate(String storeName, String dateMin, String password) {
 
         try {
 
@@ -212,24 +213,7 @@ public class ShopifyRestRepository extends BaseRestRepository {
                     .setParameter("limit", ORDER_LIMIT)
                     .build();
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.set(AUTH_HEADER, password);
-
-            ResponseEntity<OrderListResponse> response = super.executeSync(HttpMethod.GET, fullPath.toString(), null,  OrderListResponse.class, headers);
-
-            log.info("...receive response:[{}]", response.getBody().getOrders().size());
-
-            this.allOrders.put(fullPath.toString(), response.getBody().getOrders());
-
-            Optional<String> nextLinkForBatch = Optional.ofNullable(response.getHeaders().getFirst(NEXT_BATCH_HEADER));
-
-            this.getAnotherBatchIfNeed(nextLinkForBatch.orElse(null), OrderListResponse.class, TargetType.ORDERS, password);
-
-            List<OrderRestResponse> orders = allOrders.values().stream().flatMap(List::stream).collect(Collectors.toList());
-
-            allOrders = new HashMap<>();
-
-            return orders;
+            return this.getOrders(fullPath.toString(), password);
 
         } catch (Exception e) {
 
@@ -237,5 +221,55 @@ public class ShopifyRestRepository extends BaseRestRepository {
 
             throw new RestRequestException(e.getMessage());
         }
+    }
+
+    @SneakyThrows
+    @SuppressWarnings("all")
+    public List<OrderRestResponse> getOrdersAfterSpecificSinceId(String storeName, String sinceId, String password) {
+
+        try {
+
+            log.info("Sync orders after sinceId:[{}]", sinceId);
+
+            URI fullPath = new URIBuilder()
+                    .setScheme("https")
+                    .setHost(storeName + "." + host + "/")
+                    .setPath(ORDERS_POSTFIX)
+                    .setParameter("since_id", sinceId)
+                    .setParameter("limit", ORDER_LIMIT)
+                    .build();
+
+            return this.getOrders(fullPath.toString(), password);
+
+        } catch (Exception e) {
+
+            log.error("Something when wrong when try get orders:[{}], cause:[{}]", e.getMessage());
+
+            throw new RestRequestException(e.getMessage());
+        }
+    }
+
+    @SneakyThrows
+    @SuppressWarnings("all")
+    private List<OrderRestResponse> getOrders(String fullPath, String password) {
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(AUTH_HEADER, password);
+
+        ResponseEntity<OrderListResponse> response = super.executeSync(HttpMethod.GET, fullPath.toString(), null,  OrderListResponse.class, headers);
+
+        log.info("...receive response:[{}]", response.getBody().getOrders().size());
+
+        this.allOrders.put(fullPath.toString(), response.getBody().getOrders());
+
+        AtomicReference<Optional<String>> nextLinkForBatch = new AtomicReference<>(Optional.ofNullable(response.getHeaders().getFirst(NEXT_BATCH_HEADER)));
+
+        this.getAnotherBatchIfNeed(nextLinkForBatch.get().orElse(null), OrderListResponse.class, TargetType.ORDERS, password);
+
+        List<OrderRestResponse> orders = allOrders.values().stream().flatMap(List::stream).collect(Collectors.toList());
+
+        allOrders = new HashMap<>();
+
+        return orders;
     }
 }

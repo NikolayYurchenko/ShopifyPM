@@ -16,13 +16,11 @@ import com.eliftech.shopify.util.OrderUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -39,13 +37,22 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public AbstractApiResponse sync(String storeName) {
+    public AbstractApiResponse sync(String storeName, @Nullable String sinceId) {
 
         Store store = storeDataService.findByName(storeName);
 
-        Optional<String> lastOrderCreateDate = orderDataService.getCreatedAtFromLastOrder();
+        List<OrderRestResponse> orders = Collections.emptyList();
 
-        List<OrderRestResponse> orders = shopifyRestRepository.getOrders(storeName, lastOrderCreateDate.orElse(null), store.getPassword());
+        if (Objects.isNull(sinceId) || sinceId.isBlank()) {
+
+            Optional<String> lastOrderCreateDate = orderDataService.getCreatedAtFromLastOrder();
+
+            orders = shopifyRestRepository.getOrdersAfterSpecificDate(storeName, lastOrderCreateDate.orElse(null), store.getPassword());
+
+        } else {
+
+            orders = shopifyRestRepository.getOrdersAfterSpecificSinceId(storeName, sinceId, store.getPassword());
+        }
 
         List<OrderSheetRecord> records = new ArrayList<>();
 

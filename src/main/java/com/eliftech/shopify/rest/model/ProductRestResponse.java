@@ -98,7 +98,7 @@ public class ProductRestResponse implements Serializable {
 
             int indexStart = link.indexOf(",");
 
-            return link.substring(indexStart + 2, link.lastIndexOf(">") + 1);
+            return link.substring(indexStart + 2, link.lastIndexOf(">"));
         }
 
         return null;

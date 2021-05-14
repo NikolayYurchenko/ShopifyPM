@@ -44,7 +44,18 @@ public class OrderController {
 
         log.info("Request for sync orders by store name:[{}]", storeName);
 
-        return orderService.sync(storeName);
+        return orderService.sync(storeName, null);
+    }
+
+
+    @PostMapping("/sync/init")
+    @ApiOperation("Init sync of orders")
+    public AbstractApiResponse initSync(@RequestParam @NotBlank String storeName,
+                                        @RequestParam @NotBlank String sinceId) {
+
+        log.info("Request for init sync orders by store name:[{}], sinceId:[{}]", storeName, sinceId);
+
+        return orderService.sync(storeName, sinceId);
     }
 
     @GetMapping
