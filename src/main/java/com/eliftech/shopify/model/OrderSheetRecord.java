@@ -4,8 +4,6 @@ import com.eliftech.shopify.data.entity.SubProduct;
 import com.eliftech.shopify.rest.model.OrderRestResponse;
 import com.eliftech.shopify.service.OrderDictionary;
 import com.eliftech.shopify.util.OptionalUtil;
-import com.eliftech.shopify.util.OrderUtil;
-import com.google.api.services.sheets.v4.model.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -106,14 +104,7 @@ public class OrderSheetRecord {
                         this.styleAndSize, this.ldStyle, this.sku,
                         this.barCode, this.color, this.childName, this.customerName,
                         this.quantity, this.quantitySend, this.estimatedDelivery,
-                        this.sendDate, this.invoiceNumber,
-                        OrderUtil.getStaticCountries().contains(this.address.substring(0, this.address.indexOf(":")))
-                                ? new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(this.address)).setUserEnteredFormat(new CellFormat().setBackgroundColor(new Color()
-                                    .setRed(Float.valueOf("1"))
-                                    .setGreen(Float.valueOf("0"))
-                                    .setBlue(Float.valueOf("0"))))
-                                  .setUserEnteredFormat(new CellFormat().setTextFormat(new TextFormat())).toString()
-                                : this.address,
+                        this.sendDate, this.invoiceNumber, this.address,
                         this.notes, this.remark)
         );
     }
