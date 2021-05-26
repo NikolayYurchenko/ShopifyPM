@@ -8,7 +8,7 @@ PUBLIC_KEY_PATH=/home/nick/NamelyCoTest.pem
 
 echo "Shopify  pushed with version [$VER] to SANDBOX docker registry"
 
-ssh -i $PUBLIC_KEY_PATH ec2-user@ec2-3-66-190-217.eu-central-1.compute.amazonaws.com "docker service update -d --image 26341/shopify eliftech_back" //TODO: change registry
+ssh -i $PUBLIC_KEY_PATH ec2-user@ec2-3-66-190-217.eu-central-1.compute.amazonaws.com "docker service update --image 26341/shopify eliftech_back"
 
-ssh -i $PUBLIC_KEY_PATH ec2-user@ec2-3-66-190-217.eu-central-1.compute.amazonaws.com  "docker service logs eliftech_back -f --since 180s"
+ssh -i $PUBLIC_KEY_PATH ec2-user@ec2-3-66-190-217.eu-central-1.compute.amazonaws.com  "docker service logs eliftech_back -f --since 120s"
 
