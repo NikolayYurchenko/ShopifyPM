@@ -30,7 +30,7 @@ public class OrderItem {
 
      public static OrderItem filterByExternalId(List<OrderItem> orderItems, String externalUid) {
 
-          return orderItems.stream().filter(item -> item.getId().equals(externalUid))
+          return orderItems.stream().filter(item -> item.getVariantId().equals(externalUid))
                   .findFirst()
                   .orElseThrow(() -> new EntityNotFoundException("Fail to filter, sub product by external uuid:["+ externalUid +"] not found"));
      }

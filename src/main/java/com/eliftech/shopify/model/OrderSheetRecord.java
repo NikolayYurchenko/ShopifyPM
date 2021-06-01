@@ -11,9 +11,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.List;
 
 @Data
@@ -82,7 +81,10 @@ public class OrderSheetRecord {
     private String remark = "";
 
     @Builder.Default
-    private List<String> properties = Collections.emptyList();
+    private String properties = "";
+
+    @Builder.Default
+    private String customerEmail = "";
 
 
     public static OrderSheetRecord instance(OrderRestResponse order, SubProduct subProduct, String sku, FactoryType factoryType, boolean addLetter) {
@@ -94,18 +96,19 @@ public class OrderSheetRecord {
                 .externalId(order.getId())
                 .barCode(OptionalUtil.getStringOrEmpty(subProduct.getBarcode()))
                 .orderNumber(addLetter? order.getNumber() + OrderDictionary.getLetterDependOnFactoryType(factoryType) : String.valueOf(order.getNumber()))
-                .entryDate(order.getCreatedAt())
-                .estimatedDelivery(LocalDateTime.parse(order.getCreatedAt()).plusDays(12).format(formatters))
+                .entryDate(OffsetDateTime.parse(order.getCreatedAt()).format(formatters))
+                .estimatedDelivery(OffsetDateTime.parse(order.getCreatedAt()).plusDays(12).format(formatters))
                 .styleAndSize(OptionalUtil.getConcatenatedOrEmpty(subProduct.getSize(), String.valueOf(subProduct.getWeight())))
                 .sku(sku)
                 .childName(OptionalUtil.getStringOrEmpty(subProduct.getTitle()))
                 .customerName(order.getShippingAddress() == null ? "" : OptionalUtil.formatName(order.getShippingAddress().getFirstName(), order.getShippingAddress().getLastName()))
-                .address(order.getShippingAddress() == null ? "" : order.getShippingAddress().getCountry() + ":" + order.getShippingAddress().getCity() + ":" + order.getShippingAddress().getAddress1() + " ;" +  "client email: " + order.getEmail())
+                .address(order.getShippingAddress() == null ? "" : order.getShippingAddress().getCountry() + ":" + order.getShippingAddress().getCity() + ":" + order.getShippingAddress().getAddress1())
                 .quantity(String.valueOf(order.getLineItems().size()))
                 .color(OptionalUtil.getStringOrEmpty(subProduct.getColor()))
                 .notes(OptionalUtil.getStringOrEmpty(order.getNote()))
-                .properties(OrderItemProperty
-                        .formatForSheets(OrderItem.filterByExternalId(order.getLineItems(), subProduct.getExternalId()).getProperties()))
+                .customerEmail(order.getEmail())
+                .properties(String.join(",", OrderItemProperty
+                        .formatForSheets(OrderItem.filterByExternalId(order.getLineItems(), subProduct.getExternalId()).getProperties())))
                 .build();
     }
 
@@ -118,7 +121,7 @@ public class OrderSheetRecord {
                         this.barCode, this.childName, this.properties, this.customerName,
                         this.quantity, this.quantitySend, this.estimatedDelivery,
                         this.sendDate, this.invoiceNumber, this.address,
-                        this.notes, this.remark)
+                        this.notes, this.remark, this.customerEmail)
         );
     }
 }
