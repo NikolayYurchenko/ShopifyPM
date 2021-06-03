@@ -6,6 +6,7 @@ import com.eliftech.shopify.data.service.TableConfigurationDataService;
 import com.eliftech.shopify.model.GoogleClientInfo;
 import com.eliftech.shopify.model.OrderSheetRecord;
 import com.eliftech.shopify.service.contract.GoogleApp;
+import com.eliftech.shopify.util.PartitionUtil;
 import com.google.api.client.auth.oauth2.AuthorizationCodeFlow;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.TokenResponse;
@@ -18,6 +19,7 @@ import com.google.api.services.sheets.v4.model.ValueRange;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,6 +29,12 @@ import java.util.List;
 public class SheetsAppService implements GoogleApp {
 
     private static final String APP_NAME = "ShopifyManager";
+
+    @Value("${shopify.rest.orders.sheetsEntriesLimit}")
+    private int limitOfSheetRecords;
+
+    @Value("${shopify.rest.orders.requestTimeoutInMillis}")
+    private long requestTimeoutInMillis;
 
     @Autowired
     private TableConfigurationDataService configurationDataService;
@@ -67,34 +75,41 @@ public class SheetsAppService implements GoogleApp {
 
         Sheets sheets = this.getSheetManager();
 
-        records.forEach(record -> {
+        List<List<OrderSheetRecord>> partitionOfSheetRecords = PartitionUtil.ofSize(records, this.limitOfSheetRecords);
 
-            ValueRange dataBody = new ValueRange().setValues(record.prettifyForSheets());
+        for (List<OrderSheetRecord> sheetRecordsChunk : partitionOfSheetRecords) {
 
-            try {
+            sheetRecordsChunk.forEach(record -> {
 
-                log.info(dataBody.toString());
+                ValueRange dataBody = new ValueRange().setValues(record.prettifyForSheets());
 
-                TableConfiguration configuration = configurationDataService.findByType(record.getFactoryType());
+                try {
 
-                AppendValuesResponse appendBody = sheets.spreadsheets().values()
-                        .append(configuration.getTableUid(), sheetsStorageProperties.getSheetName(), dataBody)
-                        .setValueInputOption(sheetsStorageProperties.getInputOption())
-                        .setInsertDataOption(sheetsStorageProperties.getInsertDataOption())
-                        .setIncludeValuesInResponse(true)
-                        .setPrettyPrint(true)
-                        .setResponseValueRenderOption("FORMATTED_VALUE")
-                        .execute();
+                    log.info(dataBody.toString());
 
-                log.info("Just added to google sheets:[{}]", appendBody);
+                    TableConfiguration configuration = configurationDataService.findByType(record.getFactoryType());
 
-            } catch (Exception e) {
+                    AppendValuesResponse appendBody = sheets.spreadsheets().values()
+                            .append(configuration.getTableUid(), sheetsStorageProperties.getSheetName(), dataBody)
+                            .setValueInputOption(sheetsStorageProperties.getInputOption())
+                            .setInsertDataOption(sheetsStorageProperties.getInsertDataOption())
+                            .setIncludeValuesInResponse(true)
+                            .setPrettyPrint(true)
+                            .setResponseValueRenderOption("FORMATTED_VALUE")
+                            .execute();
 
-                log.info("Failed add data to table, cause:[{}]", e.getMessage());
+                    log.info("Just added to google sheets:[{}]", appendBody);
 
-                throw new RuntimeException(e.getMessage());
-            }
-        });
+                } catch (Exception e) {
+
+                    log.info("Failed add data to table, cause:[{}]", e.getMessage());
+
+                    throw new RuntimeException(e.getMessage());
+                }
+            });
+
+            Thread.sleep(this.requestTimeoutInMillis);
+        }
     }
 
     @SneakyThrows

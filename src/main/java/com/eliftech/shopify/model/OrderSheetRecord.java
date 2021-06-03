@@ -6,6 +6,7 @@ import com.eliftech.shopify.rest.model.OrderItemProperty;
 import com.eliftech.shopify.rest.model.OrderRestResponse;
 import com.eliftech.shopify.service.OrderDictionary;
 import com.eliftech.shopify.util.OptionalUtil;
+import com.eliftech.shopify.util.OrderUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -98,13 +99,13 @@ public class OrderSheetRecord {
                 .orderNumber(addLetter? order.getNumber() + OrderDictionary.getLetterDependOnFactoryType(factoryType) : String.valueOf(order.getNumber()))
                 .entryDate(OffsetDateTime.parse(order.getCreatedAt()).format(formatters))
                 .estimatedDelivery(OffsetDateTime.parse(order.getCreatedAt()).plusDays(12).format(formatters))
-                .styleAndSize(OptionalUtil.getConcatenatedOrEmpty(subProduct.getSize(), String.valueOf(subProduct.getWeight())))
+                .styleAndSize(OptionalUtil.getStringOrEmpty(OrderUtil.getStyleAndSizeFromBaseInfo(subProduct.getTitle())))
                 .sku(sku)
                 .childName(OptionalUtil.getStringOrEmpty(subProduct.getTitle()))
                 .customerName(order.getShippingAddress() == null ? "" : OptionalUtil.formatName(order.getShippingAddress().getFirstName(), order.getShippingAddress().getLastName()))
                 .address(order.getShippingAddress() == null ? "" : order.getShippingAddress().getCountry() + ":" + order.getShippingAddress().getCity() + ":" + order.getShippingAddress().getAddress1())
                 .quantity(String.valueOf(order.getLineItems().size()))
-                .color(OptionalUtil.getStringOrEmpty(subProduct.getColor()))
+                .color(OptionalUtil.getStringOrEmpty(OrderUtil.getColorFromBaseInfo(subProduct.getTitle())))
                 .notes(OptionalUtil.getStringOrEmpty(order.getNote()))
                 .customerEmail(order.getEmail())
                 .properties(String.join(",", OrderItemProperty
@@ -118,7 +119,7 @@ public class OrderSheetRecord {
 
                 List.of(this.orderNumber, this.lot, this.entryDate,
                         this.styleAndSize, this.ldStyle, this.sku,
-                        this.barCode, this.childName, this.properties, this.customerName,
+                        this.barCode, this.color, this.properties, this.customerName,
                         this.quantity, this.quantitySend, this.estimatedDelivery,
                         this.sendDate, this.invoiceNumber, this.address,
                         this.notes, this.remark, this.customerEmail)

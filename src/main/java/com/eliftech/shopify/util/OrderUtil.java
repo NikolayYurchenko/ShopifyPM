@@ -45,4 +45,42 @@ public class OrderUtil {
 
         return List.of("New Zealand", "Australia");
     }
+
+    public static String getColorFromBaseInfo(String baseInfo) {
+
+        if (baseInfo.contains("/")) {
+
+            String beforeSlashValue = baseInfo.substring(0, baseInfo.indexOf("/"));
+
+            String afterSlashValue = baseInfo.substring(baseInfo.indexOf("/") + 1);
+
+            return beforeSlashValue.contains("Base")? beforeSlashValue : afterSlashValue.contains("Base") ? afterSlashValue: "";
+
+        } else {
+
+            return baseInfo;
+        }
+    }
+
+    public static String getStyleAndSizeFromBaseInfo(String baseInfo) {
+
+        if (baseInfo.contains("/")) {
+
+            String beforeSlashValue = baseInfo.substring(0, baseInfo.indexOf("/"));
+
+            String afterSlashValue = baseInfo.substring(baseInfo.indexOf("/") + 1);
+
+            if (!beforeSlashValue.contains("Base") && !afterSlashValue.contains("Base")) {
+
+                return baseInfo;
+
+            } else {
+                return beforeSlashValue.contains("Base") ? afterSlashValue : beforeSlashValue;
+            }
+
+        } else {
+
+            return "";
+        }
+    }
 }

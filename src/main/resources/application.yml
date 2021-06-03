@@ -33,6 +33,9 @@ shopify:
     enabled: ${INIT_ENABLED:true}
   rest:
     basePath: myshopify.com/admin/api/2021-01
+    orders:
+      sheetsEntriesLimit: 100
+      requestTimeoutInMillis: 5000
     sheets:
       basePath: sheets.googleapis.com/v4/spreadsheets/
   rabbitmq:

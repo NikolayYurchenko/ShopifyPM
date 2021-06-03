@@ -19,7 +19,7 @@ public class OrderItemProperty {
     public static List<String> formatForSheets(List<OrderItemProperty> properties) {
 
         return properties.stream()
-                .map(property -> "name - " + property.getName() + " ; " + " value - " + property.getValue())
+                .map(OrderItemProperty::getValue)
                 .collect(Collectors.toList());
     }
 }
