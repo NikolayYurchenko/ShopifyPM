@@ -1,5 +1,6 @@
 package com.eliftech.shopify.rest.model;
 
+import com.eliftech.shopify.util.OrderUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,7 @@ public class OrderItemProperty {
 
         return properties.stream()
                 .map(OrderItemProperty::getValue)
+                .filter(propertyValue -> !OrderUtil.isUrlPresentInPropertyValue(propertyValue))
                 .collect(Collectors.toList());
     }
 }

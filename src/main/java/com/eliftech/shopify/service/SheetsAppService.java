@@ -77,6 +77,8 @@ public class SheetsAppService implements GoogleApp {
 
         List<List<OrderSheetRecord>> partitionOfSheetRecords = PartitionUtil.ofSize(records, this.limitOfSheetRecords);
 
+        log.debug("Participate sheet records on fixed chunk size:[{}], partition size:[{}]", this.limitOfSheetRecords, partitionOfSheetRecords.size());
+
         for (List<OrderSheetRecord> sheetRecordsChunk : partitionOfSheetRecords) {
 
             sheetRecordsChunk.forEach(record -> {
@@ -108,7 +110,12 @@ public class SheetsAppService implements GoogleApp {
                 }
             });
 
-            Thread.sleep(this.requestTimeoutInMillis);
+            if (partitionOfSheetRecords.size() > 1) {
+
+                log.info("Max size of entries:[{}] is added, make thread sleep for:[{}] milliseconds", this.limitOfSheetRecords, this.requestTimeoutInMillis);
+
+                Thread.sleep(this.requestTimeoutInMillis);
+            }
         }
     }
 

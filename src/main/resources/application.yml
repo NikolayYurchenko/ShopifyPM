@@ -35,7 +35,7 @@ shopify:
     basePath: myshopify.com/admin/api/2021-01
     orders:
       sheetsEntriesLimit: 100
-      requestTimeoutInMillis: 5000
+      requestTimeoutInMillis: 100000
     sheets:
       basePath: sheets.googleapis.com/v4/spreadsheets/
   rabbitmq:

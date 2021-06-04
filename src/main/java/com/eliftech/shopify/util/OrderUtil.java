@@ -6,6 +6,8 @@ import java.util.List;
 
 public class OrderUtil {
 
+    public static final List<String> protocols = List.of("http", "https", "ftp", "tcp");
+
     public static FactoryType defineFactoryBySku(String sku) {
 
         String number = NumberUtil.isNumeric(sku.substring(sku.lastIndexOf("-") + 1))
@@ -82,5 +84,9 @@ public class OrderUtil {
 
             return "";
         }
+    }
+
+    public static boolean isUrlPresentInPropertyValue(String value) {
+        return protocols.stream().anyMatch(value::contains);
     }
 }
