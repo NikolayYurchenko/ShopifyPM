@@ -178,10 +178,7 @@ public class ProductDataService {
 
         Optional<ProductData> productData = product.getStates().stream().filter(state -> state.getStoreUid().equals(storeUid)).findFirst();
 
-        productData.ifPresent(productState -> {
-
-            stateDataService.update(productState.getUuid().toString(), request);
-        });
+        productData.ifPresent(productState -> stateDataService.update(productState.getUuid().toString(), request));
 
         subProductDataService.update(storeUid, product, request);
     }

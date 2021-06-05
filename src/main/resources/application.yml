@@ -34,7 +34,7 @@ shopify:
   rest:
     basePath: myshopify.com/admin/api/2021-01
     orders:
-      sheetsEntriesLimit: 100
+      sheetsEntriesLimit: 60
       requestTimeoutInMillis: 100000
     sheets:
       basePath: sheets.googleapis.com/v4/spreadsheets/
